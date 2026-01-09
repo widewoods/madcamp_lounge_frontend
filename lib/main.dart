@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/pages/login.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'Madcamp Lounge',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: .fromSeed(seedColor: primary),
+        colorScheme: ColorScheme.fromSeed(seedColor: primary),
         fontFamilyFallback: const ["Apple SD Gothic Neo", "Noto Sans KR", "Roboto"],
       ),
       home: const LoginPage(),

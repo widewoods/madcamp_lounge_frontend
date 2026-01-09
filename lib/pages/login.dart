@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/pages/main_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madcamp_lounge/state/auth_state.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPage();
+  ConsumerState<LoginPage> createState() => _LoginPage();
 }
 
-class _LoginPage extends State<LoginPage> {
+class _LoginPage extends ConsumerState<LoginPage> {
   final _idCtrl = TextEditingController();
   final _pwCtrl = TextEditingController();
+  final _storage = FlutterSecureStorage();
 
   @override
   void dispose() {
@@ -48,10 +54,7 @@ class _LoginPage extends State<LoginPage> {
           gradient: RadialGradient(
             center: Alignment.topRight,
             radius: 1.2,
-            colors: [
-              Color(0xFFE8F0FF),
-              Color(0xFFF4F7FF),
-            ],
+            colors: [Color(0xFFE8F0FF), Color(0xFFF4F7FF)],
           ),
         ),
         child: SafeArea(
@@ -160,28 +163,46 @@ class _LoginPage extends State<LoginPage> {
     );
   }
 
-  void _login(BuildContext context) {
+  Future<void> _login(BuildContext context) async {
     final id = _idCtrl.text.trim();
     final pw = _pwCtrl.text;
 
-    if(id.isEmpty || pw.isEmpty) {
+    if (id.isEmpty || pw.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("아이디와 비밀번호를 입력하세요."),
-            duration: const Duration(seconds: 2),
-          )
+        SnackBar(
+          content: Text("아이디와 비밀번호를 입력하세요."),
+          duration: const Duration(seconds: 2),
+        ),
       );
+      return;
     }
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => MainPage())
+    final res = await http.post(
+      Uri.parse('http://localhost:8080/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'loginId': id, 'password': pw}),
     );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      final accessToken = data['accessToken'];
+      final refreshToken = data['refreshToken'];
+
+      ref.read(accessTokenProvider.notifier).state = accessToken;
+      await _storage.write(key: 'refreshToken', value: refreshToken);
+
+      if (!mounted) return;
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => MainPage()));
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("로그인 실패")));
+    }
   }
 }
 
 class FirstLoginText extends StatelessWidget {
-  const FirstLoginText({
-    super.key,
-  });
+  const FirstLoginText({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -198,9 +219,7 @@ class FirstLoginText extends StatelessWidget {
 }
 
 class SubtitleText extends StatelessWidget {
-  const SubtitleText({
-    super.key,
-  });
+  const SubtitleText({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -217,9 +236,7 @@ class SubtitleText extends StatelessWidget {
 }
 
 class TitleText extends StatelessWidget {
-  const TitleText({
-    super.key,
-  });
+  const TitleText({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -237,10 +254,7 @@ class TitleText extends StatelessWidget {
 }
 
 class LoginIcon extends StatelessWidget {
-  const LoginIcon({
-    super.key,
-    required this.primary,
-  });
+  const LoginIcon({super.key, required this.primary});
 
   final Color primary;
 
@@ -254,11 +268,7 @@ class LoginIcon extends StatelessWidget {
           color: primary,
           borderRadius: BorderRadius.circular(18),
         ),
-        child: const Icon(
-          Icons.login_rounded,
-          color: Colors.white,
-          size: 30,
-        ),
+        child: const Icon(Icons.login_rounded, color: Colors.white, size: 30),
       ),
     );
   }
