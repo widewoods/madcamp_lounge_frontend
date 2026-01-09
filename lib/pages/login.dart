@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madcamp_lounge/pages/main_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -163,11 +164,16 @@ class _LoginPage extends State<LoginPage> {
     final id = _idCtrl.text.trim();
     final pw = _pwCtrl.text;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("데모 로그인: id=$id, pw 길이=${pw.length}"),
-        duration: const Duration(seconds: 2),
-      ),
+    if(id.isEmpty || pw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("아이디와 비밀번호를 입력하세요."),
+            duration: const Duration(seconds: 2),
+          )
+      );
+    }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => MainPage())
     );
   }
 }

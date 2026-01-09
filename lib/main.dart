@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: .fromSeed(seedColor: primary),
+        fontFamilyFallback: const ["Apple SD Gothic Neo", "Noto Sans KR", "Roboto"],
       ),
       home: const LoginPage(),
     );
