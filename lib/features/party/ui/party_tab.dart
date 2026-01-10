@@ -55,6 +55,7 @@ class _PartyTabState extends State<PartyTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PreferredSize(preferredSize: 
         const Size.fromHeight(kToolbarHeight),
         child: PartyAppBar(onClick: _openCreatePartyDialog,),

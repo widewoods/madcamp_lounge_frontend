@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:madcamp_lounge/main.dart';
 import 'package:madcamp_lounge/pages/main_page.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
+
+import '../theme.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -26,25 +26,6 @@ class _LoginPage extends ConsumerState<LoginPage> {
     _idCtrl.dispose();
     _pwCtrl.dispose();
     super.dispose();
-  }
-
-  InputDecoration _inputDecoration(String hint) {
-    const borderColor = Color(0xFFD6D9E6);
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF9AA0AE)),
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: borderColor, width: 1),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF4C46E5), width: 1.6),
-      ),
-    );
   }
 
   @override
@@ -137,16 +118,7 @@ class _LoginPage extends ConsumerState<LoginPage> {
                         SizedBox(
                           height: 56,
                           child: FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
+                            style:Theme.of(context).filledButtonTheme.style,
                             onPressed: () => _login(context),
                             child: const Text("로그인"),
                           ),
@@ -199,10 +171,12 @@ class _LoginPage extends ConsumerState<LoginPage> {
       await _storage.write(key: 'refreshToken', value: refreshToken);
 
       if (!mounted) return;
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(
+        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(const SnackBar(content: Text("로그인 실패")));
     }
