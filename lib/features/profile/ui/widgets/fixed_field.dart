@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:madcamp_lounge/main.dart';
 
-class EditableField extends StatelessWidget {
-  const EditableField({
+
+class FixedField extends StatelessWidget {
+  const FixedField({
     required this.ctrl,
-    required this.isEditing,
     super.key,
   });
 
   final TextEditingController ctrl;
-  final bool isEditing;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: ctrl,
       maxLines: 1,
-      enabled: isEditing,
-      decoration: inputDecoration(),
+      enabled: false,
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w700,

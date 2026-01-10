@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:madcamp_lounge/features/profile/widgets/editable_field.dart';
-import 'package:madcamp_lounge/features/profile/widgets/fixed_field.dart';
-import 'package:madcamp_lounge/pages/login.dart';
-import 'package:madcamp_lounge/state/auth_state.dart';
-
-import '../../main.dart';
+import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
+import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
+import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -16,8 +11,8 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
+
   static const kPrimary = Color(0xFF4C46E5);
-  static const kBg = Color(0xFFF6F7FB);
 
   bool _isEditing = false;
 
@@ -59,7 +54,7 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
-  // TODO: 저장 로직(서버 POST 등)
+  // TODO: 저장 로직
   Future<void> _saveProfile() async {
 
   }
@@ -67,62 +62,16 @@ class _ProfileTabState extends State<ProfileTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBg,
+      appBar: PreferredSize(preferredSize:
+      const Size.fromHeight(kToolbarHeight),
+        child: ProfileAppbar(),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 상단 헤더: 내 프로필 + 수정 버튼
-              Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      "내 프로필",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.4,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() => _isEditing = !_isEditing);
-                      if (!_isEditing) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("저장(데모)")),
-                        );
-                        _saveProfile();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    icon: const Icon(Icons.edit, size: 18),
-                    label: Text(_isEditing ? "저장" : "수정"),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
               // 메인 카드
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
@@ -140,7 +89,6 @@ class _ProfileTabState extends State<ProfileTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 프로필 헤더(아바타/이름/@아이디)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -163,7 +111,7 @@ class _ProfileTabState extends State<ProfileTab> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
                               Text(
-                                "□",
+                                "테스트",
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
@@ -173,7 +121,7 @@ class _ProfileTabState extends State<ProfileTab> {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "@□",
+                                "@test",
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -221,6 +169,44 @@ class _ProfileTabState extends State<ProfileTab> {
                     EditableField(ctrl: _oneLineCtrl, isEditing: _isEditing,),
                   ],
                 ),
+              ),
+              SizedBox(height: 20,),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () => (),
+                        child: Text("비밀번호 변경"),
+                    ),
+                  ),
+                  SizedBox(width: 10,),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() => _isEditing = !_isEditing);
+                        if (!_isEditing) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("저장(데모)")),
+                          );
+                          _saveProfile();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: Text(_isEditing ? "저장" : "수정"),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

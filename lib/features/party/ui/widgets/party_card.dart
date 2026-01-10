@@ -20,13 +20,14 @@ class _PartyCardState extends State<PartyCard> {
   @override
   Widget build(BuildContext context) {
 
+    // Todo: 참가하기 로직
     void onJoin() {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("참가하기")),
       );
     }
 
-    const primary = Color(0xFF4C46E5);
+    final primary = Theme.of(context).primaryColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -56,7 +57,7 @@ class _PartyCardState extends State<PartyCard> {
                     child: Image.network(
                       widget.party.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: const Color(0xFFE5E7EB),
                         child: const Icon(Icons.image_not_supported),
                       ),
@@ -100,10 +101,10 @@ class _PartyCardState extends State<PartyCard> {
                       ),
                       const SizedBox(height: 2),
 
-                      // 카테고리(파란 링크 느낌)
+                      // 카테고리
                       Text(
                         widget.party.category,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: primary,
@@ -126,24 +127,16 @@ class _PartyCardState extends State<PartyCard> {
             ),
             const SizedBox(height: 14),
 
-            // 참가하기 버튼 (아래 가로로 길게)
             SizedBox(
               height: 48,
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: onJoin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  textStyle: const TextStyle(
+                  textStyle: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
-                  ),
+                  )
                 ),
                 child: const Text("참가하기"),
               ),

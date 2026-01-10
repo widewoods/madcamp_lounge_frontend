@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
+import 'package:madcamp_lounge/theme.dart';
 
 class CreatePartyDialog extends StatefulWidget {
   const CreatePartyDialog({super.key});
@@ -9,8 +10,6 @@ class CreatePartyDialog extends StatefulWidget {
 }
 
 class _CreatePartyDialogState extends State<CreatePartyDialog> {
-  static const kPrimary = Color(0xFF4C46E5);
-
   final _titleCtrl = TextEditingController();
   final _categoryCtrl = TextEditingController();
   final _timeCtrl = TextEditingController();
@@ -27,26 +26,10 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     super.dispose();
   }
 
-  InputDecoration _dec(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: const Color(0xFFF9FAFB),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: kPrimary, width: 1.5),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
@@ -80,7 +63,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _titleCtrl,
-                  decoration: _dec("예: 보드게임 같이 하실 분!"),
+                  decoration: inputDecorationWithHint("예: 보드게임 같이 하실 분!"),
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 12),
@@ -89,7 +72,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _categoryCtrl,
-                  decoration: _dec("예: 보드게임"),
+                  decoration: inputDecorationWithHint("예: 보드게임"),
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 12),
@@ -98,7 +81,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _timeCtrl,
-                  decoration: _dec("예: 오늘 오후 7시"),
+                  decoration: inputDecorationWithHint("예: 오늘 오후 7시"),
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 12),
@@ -107,7 +90,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _locationCtrl,
-                  decoration: _dec("예: 강남 보드게임카페"),
+                  decoration: inputDecorationWithHint("예: 강남 보드게임카페"),
                   textInputAction: TextInputAction.done,
                 ),
                 const SizedBox(height: 14),
@@ -141,12 +124,6 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
                         child: const Text("취소"),
                       ),
                     ),
@@ -155,17 +132,9 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
                           textStyle: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.2,
-                          ),
+                            fontWeight: FontWeight.bold,
+                          )
                         ),
                         child: const Text("만들기"),
                       ),
@@ -186,9 +155,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     final location = _locationCtrl.text.trim();
 
     if (title.isEmpty || category.isEmpty || time.isEmpty || location.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("모든 항목을 입력해주세요")),
-      );
+      // 입력 칸 비었을 시 reject
       return;
     }
 
