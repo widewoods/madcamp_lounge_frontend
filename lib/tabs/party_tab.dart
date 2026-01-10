@@ -31,22 +31,10 @@ class _PartyTabState extends State<PartyTab> {
     ),
   ];
 
-  void _addDemoParty() {
-    setState(() {
-      _parties.insert(
-        0,
-        Party(
-          title: "새 파티가 생성됐어요!",
-          category: "모임",
-          timeText: "모레 오후 6시",
-          locationText: "카이스트 근처",
-          current: 1,
-          max: 5,
-          imageUrl:
-          "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
-        ),
+  void _onJoin() {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("참가하기")),
       );
-    });
   }
 
   Future<void> _openCreatePartyDialog() async {
@@ -86,11 +74,7 @@ class _PartyTabState extends State<PartyTab> {
                   party.isLiked = !party.isLiked;
                 });
               },
-              onJoin: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("참가하기: ${party.title}")),
-                );
-              },
+              onJoin: _onJoin,
             ),
           );
         },
@@ -371,7 +355,6 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     );
   }
 
-  //Issue: 한국어 입력 안됨, 가상키보드 사용시 짤림
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -379,128 +362,130 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "파티 만들기",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-
-            const Text("제목", style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _titleCtrl,
-              decoration: _dec("예: 보드게임 같이 하실 분!"),
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 12),
-
-            const Text("카테고리", style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _categoryCtrl,
-              decoration: _dec("예: 보드게임"),
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 12),
-
-            const Text("시간", style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _timeCtrl,
-              decoration: _dec("예: 오늘 오후 7시"),
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 12),
-
-            const Text("장소", style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _locationCtrl,
-              decoration: _dec("예: 강남 보드게임카페"),
-              textInputAction: TextInputAction.done,
-            ),
-            const SizedBox(height: 14),
-
-            // 인원 선택
-            Row(
-              children: [
-                const Text("최대 인원", style: TextStyle(fontWeight: FontWeight.w700)),
-                const Spacer(),
-                IconButton(
-                  onPressed: _maxPeople > 2
-                      ? () => setState(() => _maxPeople--)
-                      : null,
-                  icon: const Icon(Icons.remove_circle_outline),
-                ),
-                Text("$_maxPeople명", style: const TextStyle(fontWeight: FontWeight.w800)),
-                IconButton(
-                  onPressed: _maxPeople < 20
-                      ? () => setState(() => _maxPeople++)
-                      : null,
-                  icon: const Icon(Icons.add_circle_outline),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // 버튼들
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text("취소"),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      textStyle: const TextStyle(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      "파티 만들기",
+                      style: TextStyle(
+                        fontSize: 18,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    child: const Text("만들기"),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+
+              const Text("제목", style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _titleCtrl,
+                decoration: _dec("예: 보드게임 같이 하실 분!"),
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 12),
+
+              const Text("카테고리", style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _categoryCtrl,
+                decoration: _dec("예: 보드게임"),
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 12),
+
+              const Text("시간", style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _timeCtrl,
+                decoration: _dec("예: 오늘 오후 7시"),
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 12),
+
+              const Text("장소", style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _locationCtrl,
+                decoration: _dec("예: 강남 보드게임카페"),
+                textInputAction: TextInputAction.done,
+              ),
+              const SizedBox(height: 14),
+
+              // 인원 선택
+              Row(
+                children: [
+                  const Text("최대 인원", style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: _maxPeople > 2
+                        ? () => setState(() => _maxPeople--)
+                        : null,
+                    icon: const Icon(Icons.remove_circle_outline),
+                  ),
+                  Text("$_maxPeople명", style: const TextStyle(fontWeight: FontWeight.w800)),
+                  IconButton(
+                    onPressed: _maxPeople < 20
+                        ? () => setState(() => _maxPeople++)
+                        : null,
+                    icon: const Icon(Icons.add_circle_outline),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              // 버튼들
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text("취소"),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kPrimary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      child: const Text("만들기"),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
       ),
     );
   }
