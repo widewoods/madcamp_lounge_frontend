@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../model/party.dart';
 
-class PartyCard extends StatelessWidget {
+class PartyCard extends StatefulWidget {
   const PartyCard({
     super.key,
     required this.party,
@@ -13,7 +13,13 @@ class PartyCard extends StatelessWidget {
   final VoidCallback onToggleLike;
 
   @override
+  State<PartyCard> createState() => _PartyCardState();
+}
+
+class _PartyCardState extends State<PartyCard> {
+  @override
   Widget build(BuildContext context) {
+
     void onJoin() {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("참가하기")),
@@ -48,7 +54,7 @@ class PartyCard extends StatelessWidget {
                     width: 92,
                     height: 92,
                     child: Image.network(
-                      party.imageUrl,
+                      widget.party.imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         color: const Color(0xFFE5E7EB),
@@ -70,7 +76,7 @@ class PartyCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              party.title,
+                              widget.party.title,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
@@ -80,12 +86,12 @@ class PartyCard extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: onToggleLike,
+                            onPressed: widget.onToggleLike,
                             icon: Icon(
-                              party.isLiked
+                              widget.party.isLiked
                                   ? Icons.favorite
                                   : Icons.favorite_border,
-                              color: party.isLiked
+                              color: widget.party.isLiked
                                   ? const Color(0xFFEF4444)
                                   : const Color(0xFF9CA3AF),
                             ),
@@ -96,7 +102,7 @@ class PartyCard extends StatelessWidget {
 
                       // 카테고리(파란 링크 느낌)
                       Text(
-                        party.category,
+                        widget.party.category,
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -105,13 +111,13 @@ class PartyCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
 
-                      _InfoRow(icon: Icons.access_time, text: party.timeText),
+                      _InfoRow(icon: Icons.access_time, text: widget.party.timeText),
                       const SizedBox(height: 6),
-                      _InfoRow(icon: Icons.location_on, text: party.locationText),
+                      _InfoRow(icon: Icons.location_on, text: widget.party.locationText),
                       const SizedBox(height: 6),
                       _InfoRow(
                         icon: Icons.people,
-                        text: "${party.current} / ${party.max}명",
+                        text: "${widget.party.current} / ${widget.party.max}명",
                       ),
                     ],
                   ),

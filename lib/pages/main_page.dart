@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/features/party/ui/party_tab.dart';
 import 'package:madcamp_lounge/features/profile/profile_tab.dart';
-import 'package:madcamp_lounge/features/profile/recommend_tab.dart';
+import 'package:madcamp_lounge/features/recommend/recommend_tab.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:madcamp_lounge/main.dart';
 import 'package:madcamp_lounge/pages/main_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -109,7 +110,7 @@ class _LoginPage extends ConsumerState<LoginPage> {
                           controller: _idCtrl,
                           textInputAction: TextInputAction.next,
                           enableInteractiveSelection: false,
-                          decoration: _inputDecoration("아이디를 입력하세요"),
+                          decoration: inputDecorationWithHint("아이디를 입력하세요"),
                         ),
                         const SizedBox(height: 18),
 
@@ -127,7 +128,7 @@ class _LoginPage extends ConsumerState<LoginPage> {
                           controller: _pwCtrl,
                           obscureText: true,
                           textInputAction: TextInputAction.done,
-                          decoration: _inputDecoration("비밀번호를 입력하세요"),
+                          decoration: inputDecorationWithHint("비밀번호를 입력하세요"),
                           onSubmitted: (_) => _login(context),
                         ),
                         const SizedBox(height: 20),

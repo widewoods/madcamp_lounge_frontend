@@ -1,43 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:madcamp_lounge/features/profile/widgets/editable_field.dart';
+import 'package:madcamp_lounge/features/profile/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/pages/login.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 
-// class ProfileTab extends ConsumerStatefulWidget {
-//   const ProfileTab({super.key});
-//
-//   @override
-//   ConsumerState<ProfileTab> createState() => _ProfileTabState();
-// }
-//
-// class _ProfileTabState extends ConsumerState<ProfileTab> {
-//   final _storage = const FlutterSecureStorage();
-//
-//   Future<void> _logout(BuildContext context) async {
-//     ref.read(accessTokenProvider.notifier).state = null;
-//     await _storage.delete(key: 'refreshToken');
-//
-//     if (!mounted) return;
-//     Navigator.of(context).pushAndRemoveUntil(
-//       MaterialPageRoute(builder: (_) => const LoginPage()),
-//       (route) => false,
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: SizedBox(
-//         width: 220,
-//         child: FilledButton(
-//           onPressed: () => _logout(context),
-//           child: const Text('로그아웃'),
-//         ),
-//       ),
-//     );
-//   }
-// }
+import '../../main.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -49,11 +18,10 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   static const kPrimary = Color(0xFF4C46E5);
   static const kBg = Color(0xFFF6F7FB);
-  static const kFieldFill = Color(0xFFF3F4F6);
 
   bool _isEditing = false;
 
-  // 데모 데이터 (추후 서버/상태관리로 바꾸면 됨)
+  // 수정 모드에서
   final _idCtrl = TextEditingController(text: "");
   final _nameCtrl = TextEditingController(text: "");
   final _nickCtrl = TextEditingController(text: "");
@@ -76,22 +44,6 @@ class _ProfileTabState extends State<ProfileTab> {
     super.dispose();
   }
 
-  InputDecoration _fieldDeco() {
-    return InputDecoration(
-      filled: true,
-      fillColor: kFieldFill,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: kPrimary, width: 1.5),
-      ),
-    );
-  }
-
   Widget _label(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -107,19 +59,9 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
-  Widget _field(TextEditingController ctrl, {int maxLines = 1}) {
-    return TextField(
-      controller: ctrl,
-      maxLines: maxLines,
-      enabled: _isEditing, // ✅ 수정 모드에서만 편집 가능
-      decoration: _fieldDeco(),
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.2,
-        color: Color(0xFF111827),
-      ),
-    );
+  // TODO: 저장 로직(서버 POST 등)
+  Future<void> _saveProfile() async {
+
   }
 
   @override
@@ -150,10 +92,10 @@ class _ProfileTabState extends State<ProfileTab> {
                     onPressed: () {
                       setState(() => _isEditing = !_isEditing);
                       if (!_isEditing) {
-                        // TODO: 저장 로직(서버 POST 등)
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("저장(데모)")),
                         );
+                        _saveProfile();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -248,67 +190,35 @@ class _ProfileTabState extends State<ProfileTab> {
 
                     // 폼 영역
                     _label("아이디"),
-                    _field(_idCtrl),
+                    FixedField(ctrl: _idCtrl,),
 
                     const SizedBox(height: 16),
                     _label("이름"),
-                    _field(_nameCtrl),
+                    FixedField(ctrl: _nameCtrl,),
 
                     const SizedBox(height: 16),
                     _label("별명"),
-                    _field(_nickCtrl),
+                    EditableField(ctrl: _nickCtrl, isEditing: _isEditing,),
 
                     const SizedBox(height: 16),
                     _label("MBTI"),
-                    // MBTI는 UI상 읽기 전용 느낌이 강해서 수정모드여도 막고 싶으면 enabled:false로 따로 처리 가능
-                    TextField(
-                      controller: _mbtiCtrl,
-                      enabled: _isEditing, // 필요하면 false로 고정 가능
-                      decoration: _fieldDeco(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.2,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
+                    FixedField(ctrl: _nameCtrl,),
 
                     const SizedBox(height: 16),
                     _label("학교"),
-                    // “설정 안됨” 같은 값은 편집모드 아니면 그대로 보여주기
-                    TextField(
-                      controller: _schoolCtrl,
-                      enabled: _isEditing,
-                      decoration: _fieldDeco(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.2,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
+                    FixedField(ctrl: _schoolCtrl),
 
                     const SizedBox(height: 16),
                     _label("취미"),
-                    TextField(
-                      controller: _hobbyCtrl,
-                      enabled: _isEditing,
-                      decoration: _fieldDeco(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.2,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
+                    EditableField(ctrl: _hobbyCtrl, isEditing: _isEditing,),
 
                     const SizedBox(height: 16),
                     _label("분반"),
-                    _field(_classCtrl),
+                    FixedField(ctrl: _classCtrl),
 
                     const SizedBox(height: 16),
                     _label("한마디"),
-                    _field(_oneLineCtrl, maxLines: 2),
+                    EditableField(ctrl: _oneLineCtrl, isEditing: _isEditing,),
                   ],
                 ),
               ),

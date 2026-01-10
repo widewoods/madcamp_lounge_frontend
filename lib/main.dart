@@ -24,3 +24,40 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+InputDecoration inputDecoration() {
+  const borderColor = Color(0xFFD6D9E6);
+  return InputDecoration(
+    filled: true,
+    fillColor: Colors.white,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: borderColor, width: 1),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: Color(0xFF4C46E5), width: 1.6),
+    ),
+  );
+}
+
+InputDecoration inputDecorationWithHint(String hint) {
+  const borderColor = Color(0xFFD6D9E6);
+  return InputDecoration(
+    hintText: hint,
+    hintStyle: const TextStyle(color: Color(0xFF9AA0AE)),
+    filled: true,
+    fillColor: Colors.white,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: borderColor, width: 1),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: Color(0xFF4C46E5), width: 1.6),
+    ),
+  );
+}
+
