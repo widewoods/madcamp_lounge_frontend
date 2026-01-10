@@ -15,7 +15,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
   final _timeCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
 
-  int _maxPeople = 6;
+  int _capacity = 6;
 
   @override
   void dispose() {
@@ -101,15 +101,15 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     const Text("최대 인원", style: TextStyle(fontWeight: FontWeight.w700)),
                     const Spacer(),
                     IconButton(
-                      onPressed: _maxPeople > 2
-                          ? () => setState(() => _maxPeople--)
+                      onPressed: _capacity > 2
+                          ? () => setState(() => _capacity--)
                           : null,
                       icon: const Icon(Icons.remove_circle_outline),
                     ),
-                    Text("$_maxPeople명", style: const TextStyle(fontWeight: FontWeight.w800)),
+                    Text("$_capacity명", style: const TextStyle(fontWeight: FontWeight.w800)),
                     IconButton(
-                      onPressed: _maxPeople < 20
-                          ? () => setState(() => _maxPeople++)
+                      onPressed: _capacity < 20
+                          ? () => setState(() => _capacity++)
                           : null,
                       icon: const Icon(Icons.add_circle_outline),
                     ),
@@ -165,7 +165,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
       timeText: time,
       locationText: location,
       current: 1,
-      max: _maxPeople,
+      max: _capacity,
       imageUrl:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
     );
