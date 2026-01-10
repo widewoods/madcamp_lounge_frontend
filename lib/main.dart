@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:madcamp_lounge/pages/login.dart';
+import 'package:madcamp_lounge/auth_gate.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: primary),
         fontFamilyFallback: const ["Apple SD Gothic Neo", "Noto Sans KR", "Roboto"],
       ),
-      home: const LoginPage(),
+      home: const AuthGate(),
     );
   }
 }

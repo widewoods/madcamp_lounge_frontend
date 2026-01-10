@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -176,10 +177,11 @@ class _LoginPage extends ConsumerState<LoginPage> {
       );
       return;
     }
-    final res = await http.post(
-      Uri.parse('http://localhost:8080/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'loginId': id, 'password': pw}),
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.postJson(
+      '/auth/login',
+      body: {'loginId': id, 'password': pw},
+      useAuth: false,
     );
 
     if (res.statusCode == 200) {
@@ -191,7 +193,7 @@ class _LoginPage extends ConsumerState<LoginPage> {
       await _storage.write(key: 'refreshToken', value: refreshToken);
 
       if (!mounted) return;
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => MainPage()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(
