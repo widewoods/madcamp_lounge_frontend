@@ -79,6 +79,12 @@ ThemeData buildTheme() {
         fontSize: 25,
         color: Colors.black,
       ),
+    ),
+
+    dialogTheme: DialogThemeData(
+      backgroundColor: scaffoldBackgroundColor,
+      insetPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))
     )
   );
 }

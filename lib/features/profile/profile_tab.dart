@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
+import 'package:madcamp_lounge/features/profile/ui/widgets/change_password_dialog.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
@@ -56,6 +57,46 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
     }
   }
 
+  Future<void> _saveProfile() async {
+    final apiClient = ref.read(apiClientProvider);
+    final body = <String, dynamic>{};
+    final nickname = _nickCtrl.text.trim();
+    if(nickname.isNotEmpty) body['nickname'] = nickname;
+
+    final hobby = _hobbyCtrl.text.trim();
+    if(hobby.isNotEmpty) body['hobby'] = hobby;
+
+    final introduction = _introductionCtrl.text.trim();
+    if(introduction.isNotEmpty) body['introduction'] = introduction;
+
+
+    final res = await apiClient.patchJson(
+      '/profile/edit',
+      body: body,
+    );
+
+    if(!mounted) return;
+
+    if(res.statusCode == 200){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('저장 완료')),
+      );
+      setState(() {});
+    } else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('저장 실패: ${res.statusCode}')),
+      );
+    }
+  }
+
+  Future<void> _openChangePasswordDialog() async {
+    final created = await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => const ChangePasswordDialog(),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -88,11 +129,6 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
         ),
       ),
     );
-  }
-
-  // TODO: 저장 로직
-  Future<void> _saveProfile() async {
-
   }
 
   @override
@@ -211,20 +247,19 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                        onPressed: () => (),
+                        onPressed: () {
+                          _openChangePasswordDialog();
+                        },
                         child: Text("비밀번호 변경"),
                     ),
                   ),
                   SizedBox(width: 10,),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() => _isEditing = !_isEditing);
                         if (!_isEditing) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("저장(데모)")),
-                          );
-                          _saveProfile();
+                          await _saveProfile();
                         }
                       },
                       style: ElevatedButton.styleFrom(

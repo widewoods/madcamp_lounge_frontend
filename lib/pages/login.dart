@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/pages/main_page.dart';
 import 'dart:convert';
