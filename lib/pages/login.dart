@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/pages/main_page.dart';
 import 'dart:convert';
@@ -141,11 +140,6 @@ class _LoginPage extends ConsumerState<LoginPage> {
   Future<void> _login(BuildContext context) async {
     final id = _idCtrl.text.trim();
     final pw = _pwCtrl.text;
-
-    if(kDebugMode){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
-      return;
-    }
 
     if (id.isEmpty || pw.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

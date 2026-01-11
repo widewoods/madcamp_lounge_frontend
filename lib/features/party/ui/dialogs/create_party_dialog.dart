@@ -29,9 +29,6 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
           child: SingleChildScrollView(
