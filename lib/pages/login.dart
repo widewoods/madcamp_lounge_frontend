@@ -144,6 +144,7 @@ class _LoginPage extends ConsumerState<LoginPage> {
 
     if(kDebugMode){
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
+      return;
     }
 
     if (id.isEmpty || pw.isEmpty) {

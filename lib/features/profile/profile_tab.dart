@@ -1,16 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
 
-class ProfileTab extends StatefulWidget {
+class ProfileTab extends ConsumerStatefulWidget {
   const ProfileTab({super.key});
 
   @override
-  State<ProfileTab> createState() => _ProfileTabState();
+  ConsumerState<ProfileTab> createState() => _ProfileTabState();
 }
 
-class _ProfileTabState extends State<ProfileTab> {
+class _ProfileTabState extends ConsumerState<ProfileTab> {
 
   static const kPrimary = Color(0xFF4C46E5);
 
@@ -25,6 +29,25 @@ class _ProfileTabState extends State<ProfileTab> {
   final _hobbyCtrl = TextEditingController(text: "설정 안됨");
   final _classCtrl = TextEditingController(text: "");
   final _oneLineCtrl = TextEditingController(text: "");
+
+  Future<void> _loadProfile() async {
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.get('/profile/me');
+
+    if(res.statusCode == 200){
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+
+      _idCtrl.text = (data['id'] ?? '') as String;
+    } else{
+      throw Exception('Failed: ${res.statusCode} ${res.body}');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
 
   @override
   void dispose() {
@@ -150,7 +173,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
                     const SizedBox(height: 16),
                     _label("MBTI"),
-                    FixedField(ctrl: _nameCtrl,),
+                    FixedField(ctrl: _mbtiCtrl,),
 
                     const SizedBox(height: 16),
                     _label("학교"),
