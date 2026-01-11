@@ -24,22 +24,35 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
   final _idCtrl = TextEditingController(text: "");
   final _nameCtrl = TextEditingController(text: "");
   final _nickCtrl = TextEditingController(text: "");
-  final _mbtiCtrl = TextEditingController(text: "INTJ");
-  final _schoolCtrl = TextEditingController(text: "설정 안됨");
-  final _hobbyCtrl = TextEditingController(text: "설정 안됨");
+  final _mbtiCtrl = TextEditingController(text: "");
+  final _schoolCtrl = TextEditingController(text: "");
+  final _hobbyCtrl = TextEditingController(text: "");
   final _classCtrl = TextEditingController(text: "");
-  final _oneLineCtrl = TextEditingController(text: "");
+  final _introductionCtrl = TextEditingController(text: "");
 
   Future<void> _loadProfile() async {
     final apiClient = ref.read(apiClientProvider);
     final res = await apiClient.get('/profile/me');
 
+    if(!mounted) return;
+
     if(res.statusCode == 200){
       final data = jsonDecode(res.body) as Map<String, dynamic>;
 
-      _idCtrl.text = (data['id'] ?? '') as String;
+      _idCtrl.text = (data['loginId'] ?? '').toString();
+      _nameCtrl.text = (data['name'] ?? '').toString();
+      _nickCtrl.text = (data['nickname'] ?? '').toString();
+      _mbtiCtrl.text = (data['mbti'] ?? '').toString();
+      _schoolCtrl.text = (data['university'] ?? '').toString();
+      _hobbyCtrl.text = (data['hobby'] ?? '').toString();
+      _classCtrl.text = (data['classSection'] ?? '').toString();
+      _introductionCtrl.text = (data['introduction'] ?? '').toString();
+
+      setState(() {});
     } else{
-      throw Exception('Failed: ${res.statusCode} ${res.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed: ${res.statusCode}')),
+      );
     }
   }
 
@@ -58,7 +71,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
     _schoolCtrl.dispose();
     _hobbyCtrl.dispose();
     _classCtrl.dispose();
-    _oneLineCtrl.dispose();
+    _introductionCtrl.dispose();
     super.dispose();
   }
 
@@ -132,9 +145,9 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
-                                "테스트",
+                                _nameCtrl.text,
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
@@ -144,7 +157,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "@test",
+                                "@${_idCtrl.text}",
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -189,7 +202,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
 
                     const SizedBox(height: 16),
                     _label("한마디"),
-                    EditableField(ctrl: _oneLineCtrl, isEditing: _isEditing,),
+                    EditableField(ctrl: _introductionCtrl, isEditing: _isEditing,),
                   ],
                 ),
               ),

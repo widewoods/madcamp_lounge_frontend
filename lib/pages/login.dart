@@ -142,11 +142,6 @@ class _LoginPage extends ConsumerState<LoginPage> {
     final id = _idCtrl.text.trim();
     final pw = _pwCtrl.text;
 
-    if(kDebugMode){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
-      return;
-    }
-
     if (id.isEmpty || pw.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
