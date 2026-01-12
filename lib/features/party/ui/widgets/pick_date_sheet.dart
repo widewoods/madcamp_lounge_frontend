@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 String formatDateLabel(DateTime d) {
-  final now = DateTime.now();
-
   const wd = ["월", "화", "수", "목", "금", "토", "일"];
   final weekday = wd[d.weekday - 1];
   return "${d.month}월 ${d.day}일 ($weekday)";

@@ -11,8 +11,10 @@ class Party {
     required this.targetCount,
     required this.imageUrl,
     required this.members,
+    this.content,
     this.isLiked = false,
     this.joined = false,
+    required this.isHost,
   });
 
   int? partyId;
@@ -23,11 +25,13 @@ class Party {
   final int currentCount;
   final int targetCount;
   final String imageUrl;
-  final List<Map<String, dynamic>> members;
+  final List<dynamic> members;
   bool isLiked;
   bool joined;
+  String? content;
+  final bool isHost;
 
-  factory Party.fromJson(Map<String, dynamic> json){
+  factory Party.fromJson(Map<String, dynamic> json, bool isHost){
     final formattedTime = formatIsoKorean(parseIso(json['appointment_time']));
 
     return Party(
@@ -40,9 +44,9 @@ class Party {
       targetCount: json['target_count'] as int,
       imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
       isLiked: false,
-      // Todo: get members
-      members: []
-      // members: json['members'] as List<Map<String, dynamic>>
+      content: json['content'].toString(),
+      members: json['members'] as List<dynamic>,
+      isHost: isHost,
     );
   }
 }

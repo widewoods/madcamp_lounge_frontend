@@ -18,6 +18,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
   final _dateCtrl = TextEditingController();
   final _timeCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
+  final _contentCtrl = TextEditingController();
 
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
@@ -30,6 +31,8 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     _categoryCtrl.dispose();
     _timeCtrl.dispose();
     _locationCtrl.dispose();
+    _dateCtrl.dispose();
+    _contentCtrl.dispose();
     super.dispose();
   }
 
@@ -126,6 +129,15 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 ),
                 const SizedBox(height: 14),
 
+                const Text("설명", style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _contentCtrl,
+                  decoration: inputDecorationWithHint("설명 한두마디"),
+                  textInputAction: TextInputAction.done,
+                ),
+                const SizedBox(height: 14),
+
                 // 인원 선택
                 Row(
                   children: [
@@ -185,6 +197,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     final date = _dateCtrl.text.trim();
     final time = _timeCtrl.text.trim();
     final location = _locationCtrl.text.trim();
+    final content = _contentCtrl.text.trim();
 
     if (title.isEmpty || category.isEmpty || time.isEmpty || date.isEmpty || location.isEmpty) {
       // 입력 칸 비었을 시 reject
@@ -201,7 +214,9 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
       targetCount: _capacity,
       imageUrl:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
-      members: []
+      members: [],
+      content: content,
+      isHost: true,
     );
 
     Navigator.pop(context, party);

@@ -7,6 +7,7 @@ import 'package:madcamp_lounge/features/party/ui/widgets/party_appbar.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/party_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
+import 'package:madcamp_lounge/features/party/ui/widgets/party_description.dart';
 
 class PartyTab extends ConsumerStatefulWidget {
   const PartyTab({super.key});
@@ -56,13 +57,12 @@ class _PartyTabState extends ConsumerState<PartyTab> {
         body: {
           'title': created.title,
           'category': created.category,
+          'content': created.content,
           'appointment_time': created.time,
           'place_name': created.locationText,
           'target_count': created.targetCount,
         }
       );
-
-      created.partyId = jsonDecode(res.body)['id'] as int;
 
       if(!mounted) return;
 
@@ -70,6 +70,9 @@ class _PartyTabState extends ConsumerState<PartyTab> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('파티 생성됨')),
         );
+        created.partyId = jsonDecode(res.body)['id'] as int;
+
+        await  _getPartyList();
       } else{
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed: ${res.statusCode}')),
@@ -89,11 +92,12 @@ class _PartyTabState extends ConsumerState<PartyTab> {
     if(res.statusCode == 200){
       final data = jsonDecode(res.body);
       setState(() {
-        _parties = List<Party>.from(data.map((e) => Party.fromJson(e)));
+        _parties = List<Party>.from(data.where((p) => p['status'] == "OPEN").map((e) => Party.fromJson(e, _userId == e['host_id'])));
+        for(Party p in _parties){
+          final memberList = p.members.map((e) => e['user_id']).toList();
+          p.joined = memberList.contains(_userId);
+        }
       });
-      for(Party p in _parties){
-        p.joined = p.members.map((e) => e['id']).contains(_userId);
-      }
 
     } else{
       ScaffoldMessenger.of(context).showSnackBar(
@@ -118,6 +122,21 @@ class _PartyTabState extends ConsumerState<PartyTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to get userId: ${res.statusCode}')),
       );
+    }
+  }
+
+  Future<void> _openPartyDescription(Party party) async {
+    final closedPartyId = await showDialog<int>(
+      context: context,
+      builder: (_) => PartyDescription(party: party),
+    );
+
+    if (!mounted) return;
+
+    if (closedPartyId != null) {
+      setState(() {
+        _parties.removeWhere((p) => p.partyId == closedPartyId);
+      });
     }
   }
 
@@ -146,12 +165,7 @@ class _PartyTabState extends ConsumerState<PartyTab> {
             padding: const EdgeInsets.only(bottom: 14),
             child: PartyCard(
               party: party,
-              onToggleLike: () {
-                setState(() {
-                  party.isLiked = !party.isLiked;
-                });
-              },
-              joined: party.joined,
+              onTap: () => _openPartyDescription(party),
             ),
           );
         },
