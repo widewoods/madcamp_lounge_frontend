@@ -1,25 +1,29 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
-import 'package:madcamp_lounge/features/party/ui/dialogs/create_party_dialog.dart';
+import 'package:madcamp_lounge/features/party/ui/widgets/create_party_dialog.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/party_appbar.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/party_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madcamp_lounge/api_client.dart';
 
-class PartyTab extends StatefulWidget {
+class PartyTab extends ConsumerStatefulWidget {
   const PartyTab({super.key});
 
   @override
-  State<PartyTab> createState() => _PartyTabState();
+  ConsumerState<PartyTab> createState() => _PartyTabState();
 }
 
-class _PartyTabState extends State<PartyTab> {
-  final List<Party> _parties = [
+class _PartyTabState extends ConsumerState<PartyTab> {
+  List<Party> _parties = [
     Party(
       title: "보드게임 같이 하실 분!",
       category: "보드게임",
       timeText: "오늘 오후 7시",
       locationText: "강남 보드게임카페",
-      current: 3,
-      max: 6,
+      currentCount: 3,
+      targetCount: 6,
       imageUrl:
       "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=400&q=80",
     ),
@@ -28,14 +32,12 @@ class _PartyTabState extends State<PartyTab> {
       category: "볼링",
       timeText: "내일 오후 3시",
       locationText: "신촌 볼링장",
-      current: 2,
-      max: 4,
+      currentCount: 2,
+      targetCount: 4,
       imageUrl:
       "https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?auto=format&fit=crop&w=400&q=80",
     ),
   ];
-
-
 
   Future<void> _openCreatePartyDialog() async {
     final created = await showDialog<Party>(
@@ -51,6 +53,30 @@ class _PartyTabState extends State<PartyTab> {
     }
   }
 
+  Future<void> _getPartyList() async {
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.get('/party/list');
+
+    if(!mounted) return;
+
+    if(res.statusCode == 200){
+      final data = jsonDecode(res.body);
+      setState(() {
+        _parties = data.map((e) => Party.fromJson(e)).toList();
+      });
+
+    } else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed: ${res.statusCode}')),
+      );
+    }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _getPartyList();
+  }
 
   @override
   Widget build(BuildContext context) {

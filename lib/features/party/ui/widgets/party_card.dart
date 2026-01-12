@@ -118,7 +118,7 @@ class _PartyCardState extends State<PartyCard> {
                       const SizedBox(height: 6),
                       _InfoRow(
                         icon: Icons.people,
-                        text: "${widget.party.current} / ${widget.party.max}명",
+                        text: "${widget.party.currentCount} / ${widget.party.targetCount}명",
                       ),
                     ],
                   ),

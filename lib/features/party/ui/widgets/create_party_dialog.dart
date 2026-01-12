@@ -161,8 +161,8 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
       category: category,
       timeText: time,
       locationText: location,
-      current: 1,
-      max: _capacity,
+      currentCount: 1,
+      targetCount: _capacity,
       imageUrl:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
     );

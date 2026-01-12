@@ -79,7 +79,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
 
     if(res.statusCode == 200){
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('저장 완료')),
+        SnackBar(content: Text('저장 완료'), duration: Duration(seconds: 1),),
       );
       setState(() {});
     } else{
@@ -90,7 +90,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
   }
 
   Future<void> _openChangePasswordDialog() async {
-    final created = await showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: true,
       builder: (_) => const ChangePasswordDialog(),

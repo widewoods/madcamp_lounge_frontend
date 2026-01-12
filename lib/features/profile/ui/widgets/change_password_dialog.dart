@@ -43,7 +43,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     final kPrimary = Theme.of(context).primaryColor;
     final newPassword = _newPasswordCtrl.text;
     final confirmPassword = _confirmPasswordCtrl.text;
-    final passwordIsSame = newPassword == confirmPassword;
+    final changeEnabled = newPassword == confirmPassword && _newPasswordCtrl.text.isNotEmpty;
 
     return Dialog(
       child: Padding(
@@ -92,7 +92,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
-                        side: BorderSide(width:1.6, color: Color(0xFFF4F4F5))
+                        side: BorderSide(width:1.6, color: Color(0xFFD5D5D5))
                       ),
                       onPressed: () {
                       Navigator.of(context).pop(context);
@@ -103,7 +103,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
                   const SizedBox(width: 15),
                   Expanded(
                       child: ElevatedButton(
-                        onPressed: passwordIsSame ? () {
+                        onPressed: changeEnabled ? () {
                           _changePassword();
                           Navigator.of(context).pop(context);
                         } : null,
