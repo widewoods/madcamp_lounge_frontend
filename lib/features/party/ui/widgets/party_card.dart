@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
-import 'package:madcamp_lounge/features/party/ui/widgets/party_description.dart';
 
 import '../../model/party.dart';
 

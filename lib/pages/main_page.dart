@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madcamp_lounge/features/chatting/chatting_tab.dart';
 import 'package:madcamp_lounge/features/party/ui/party_tab.dart';
 import 'package:madcamp_lounge/features/profile/profile_tab.dart';
 import 'package:madcamp_lounge/features/recommend/recommend_tab.dart';
@@ -15,6 +16,7 @@ class _MainPageState extends State<MainPage> {
   static const List<Widget> _tabs = <Widget>[
     PartyTab(),
     RecommendTab(),
+    ChattingTab(),
     ProfileTab(),
   ];
 
@@ -45,6 +47,10 @@ class _MainPageState extends State<MainPage> {
                 label: "놀거리 추천"
             ),
             BottomNavigationBarItem(
+                icon: Icon(Icons.chat),
+                label: "채팅"
+            ),
+            BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline),
                 label: "프로필"
             ),
@@ -58,6 +64,7 @@ class _MainPageState extends State<MainPage> {
           ),
           currentIndex: _selectedIndex,
           onTap: _onIconTapped,
+          type: BottomNavigationBarType.fixed,
         ),
       ),
     );

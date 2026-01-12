@@ -5,6 +5,18 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+val naverMapClientId: String =
+    (project.findProperty("NAVER_MAP_CLIENT_ID") as String?)
+        ?: localProperties.getProperty("NAVER_MAP_CLIENT_ID")
+        ?: ""
+
 android {
     namespace = "io.github.widewoods.madcamp_lounge"
     compileSdk = flutter.compileSdkVersion
@@ -28,6 +40,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["NAVER_MAP_CLIENT_ID"] = naverMapClientId
     }
 
     buildTypes {

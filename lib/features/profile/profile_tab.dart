@@ -7,6 +7,7 @@ import 'package:madcamp_lounge/features/profile/ui/widgets/change_password_dialo
 import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
+import 'package:madcamp_lounge/pages/login.dart';
 
 class ProfileTab extends ConsumerStatefulWidget {
   const ProfileTab({super.key});
@@ -118,14 +119,14 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
 
   Widget _label(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 5),
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: FontWeight.w800,
           letterSpacing: -0.2,
-          color: Color(0xFF1F2937),
+          color: Color(0xFF4C46E5),
         ),
       ),
     );
@@ -206,79 +207,108 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                       ],
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 10),
 
                     // 폼 영역
                     _label("아이디"),
                     FixedField(ctrl: _idCtrl,),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("이름"),
                     FixedField(ctrl: _nameCtrl,),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("별명"),
                     EditableField(ctrl: _nickCtrl, isEditing: _isEditing,),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("MBTI"),
                     FixedField(ctrl: _mbtiCtrl,),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("학교"),
                     FixedField(ctrl: _schoolCtrl),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("취미"),
                     EditableField(ctrl: _hobbyCtrl, isEditing: _isEditing,),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("분반"),
                     FixedField(ctrl: _classCtrl),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     _label("한마디"),
                     EditableField(ctrl: _introductionCtrl, isEditing: _isEditing,),
+                    const SizedBox(height: 20,),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _openChangePasswordDialog();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.lock_outline),
+                                const SizedBox(width: 3),
+                                Text("비밀번호 변경"),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              setState(() => _isEditing = !_isEditing);
+                              if (!_isEditing) {
+                                await _saveProfile();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            icon: const Icon(Icons.edit, size: 18),
+                            label: Text(_isEditing ? "저장" : "수정"),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              SizedBox(height: 20,),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                        onPressed: () {
-                          _openChangePasswordDialog();
-                        },
-                        child: Text("비밀번호 변경"),
-                    ),
-                  ),
-                  SizedBox(width: 10,),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        setState(() => _isEditing = !_isEditing);
-                        if (!_isEditing) {
-                          await _saveProfile();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                      icon: const Icon(Icons.edit, size: 18),
-                      label: Text(_isEditing ? "저장" : "수정"),
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.logout_outlined),
+                    const SizedBox(width: 4),
+
+                    Text("로그아웃"),
+                  ],
+                )
+              )
             ],
           ),
         ),

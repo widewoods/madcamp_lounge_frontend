@@ -62,7 +62,7 @@ ThemeData buildTheme() {
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: inputBorderColor, width: 1.6),
@@ -70,6 +70,10 @@ ThemeData buildTheme() {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: kPrimary, width: 2.3),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFFF3F4F6), width: 1.0),
       ),
     ),
 
