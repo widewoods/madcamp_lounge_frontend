@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:madcamp_lounge/features/party/date_formatting.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
+import 'package:madcamp_lounge/features/party/ui/widgets/pick_date_sheet.dart';
+import 'package:madcamp_lounge/features/party/ui/widgets/pick_time_sheet.dart';
 import 'package:madcamp_lounge/theme.dart';
 
 class CreatePartyDialog extends StatefulWidget {
@@ -12,8 +15,12 @@ class CreatePartyDialog extends StatefulWidget {
 class _CreatePartyDialogState extends State<CreatePartyDialog> {
   final _titleCtrl = TextEditingController();
   final _categoryCtrl = TextEditingController();
+  final _dateCtrl = TextEditingController();
   final _timeCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
+
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
 
   int _capacity = 6;
 
@@ -60,7 +67,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _titleCtrl,
-                  decoration: inputDecorationWithHint("예: 보드게임 같이 하실 분!"),
+                  decoration: inputDecorationWithHint("파티 제목"),
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 12),
@@ -74,12 +81,39 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 ),
                 const SizedBox(height: 12),
 
+                const Text("날짜", style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                TextField(
+                    controller: _dateCtrl,
+                    decoration: inputDecorationWithHint("날짜 선택"),
+                    textInputAction: TextInputAction.next,
+                    readOnly: true,
+                    onTap: () async {
+                      final picked = await showDatePickerSheet(context);
+                      if (picked == null) return;
+                      setState(() {
+                        _dateCtrl.text = formatDateLabel(picked);
+                      });
+                      _selectedDate = picked;
+                    }
+                ),
+
                 const Text("시간", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _timeCtrl,
-                  decoration: inputDecorationWithHint("예: 오늘 오후 7시"),
+                  decoration: inputDecorationWithHint("시간 선택"),
                   textInputAction: TextInputAction.next,
+                  readOnly: true,
+                  onTap: () async {
+                    final picked = await showTimeGridSheet(context);
+                    if (picked == null) return;
+                    setState(() {
+                      _timeCtrl.text =
+                      "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
+                    });
+                    _selectedTime = picked;
+                  }
                 ),
                 const SizedBox(height: 12),
 
@@ -87,7 +121,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _locationCtrl,
-                  decoration: inputDecorationWithHint("예: 강남 보드게임카페"),
+                  decoration: inputDecorationWithHint("만날 장소"),
                   textInputAction: TextInputAction.done,
                 ),
                 const SizedBox(height: 14),
@@ -148,23 +182,26 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
   void _submit() {
     final title = _titleCtrl.text.trim();
     final category = _categoryCtrl.text.trim();
+    final date = _dateCtrl.text.trim();
     final time = _timeCtrl.text.trim();
     final location = _locationCtrl.text.trim();
 
-    if (title.isEmpty || category.isEmpty || time.isEmpty || location.isEmpty) {
+    if (title.isEmpty || category.isEmpty || time.isEmpty || date.isEmpty || location.isEmpty) {
       // 입력 칸 비었을 시 reject
       return;
     }
 
     final party = Party(
+      partyId: 0,
       title: title,
       category: category,
-      timeText: time,
+      time: dateTimeToIsoFromPickers(selectedDate: _selectedDate!, selectedTime: _selectedTime!),
       locationText: location,
       currentCount: 1,
       targetCount: _capacity,
       imageUrl:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
+      members: []
     );
 
     Navigator.pop(context, party);

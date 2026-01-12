@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madcamp_lounge/api_client.dart';
 
 import '../../model/party.dart';
 
@@ -7,10 +11,12 @@ class PartyCard extends StatefulWidget {
     super.key,
     required this.party,
     required this.onToggleLike,
+    required this.joined,
   });
 
   final Party party;
   final VoidCallback onToggleLike;
+  final bool joined;
 
   @override
   State<PartyCard> createState() => _PartyCardState();
@@ -19,14 +25,6 @@ class PartyCard extends StatefulWidget {
 class _PartyCardState extends State<PartyCard> {
   @override
   Widget build(BuildContext context) {
-
-    // Todo: 참가하기 로직
-    void onJoin() {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("참가하기")),
-      );
-    }
-
     final primary = Theme.of(context).primaryColor;
 
     return Container(
@@ -86,17 +84,6 @@ class _PartyCardState extends State<PartyCard> {
                               ),
                             ),
                           ),
-                          IconButton(
-                            onPressed: widget.onToggleLike,
-                            icon: Icon(
-                              widget.party.isLiked
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: widget.party.isLiked
-                                  ? const Color(0xFFEF4444)
-                                  : const Color(0xFF9CA3AF),
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 2),
@@ -112,7 +99,7 @@ class _PartyCardState extends State<PartyCard> {
                       ),
                       const SizedBox(height: 10),
 
-                      _InfoRow(icon: Icons.access_time, text: widget.party.timeText),
+                      _InfoRow(icon: Icons.access_time, text: widget.party.time),
                       const SizedBox(height: 6),
                       _InfoRow(icon: Icons.location_on, text: widget.party.locationText),
                       const SizedBox(height: 6),
@@ -127,22 +114,66 @@ class _PartyCardState extends State<PartyCard> {
             ),
             const SizedBox(height: 14),
 
-            SizedBox(
-              height: 48,
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onJoin,
-                style: ElevatedButton.styleFrom(
-                  textStyle: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  )
-                ),
-                child: const Text("참가하기"),
-              ),
-            ),
+            JoinButton(joined: widget.joined, partyId: widget.party.partyId!),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class JoinButton extends ConsumerStatefulWidget {
+
+  const JoinButton({
+    super.key,
+    required this.joined,
+    required this.partyId,
+  });
+
+  final bool joined;
+  final int partyId;
+
+  @override
+  ConsumerState<JoinButton> createState() => _JoinButtonState();
+}
+
+class _JoinButtonState extends ConsumerState<JoinButton> {
+  Future<void> _onJoin() async {
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.postJson(
+      '/party/join',
+      body: {
+        'party_id': widget.partyId,
+      }
+    );
+
+    if(!mounted) return;
+
+    if(res.statusCode == 200){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('참가 완료')),
+      );
+    } else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed: ${res.statusCode}')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: widget.joined ? null : _onJoin,
+        style: ElevatedButton.styleFrom(
+          textStyle: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+          )
+        ),
+        child: const Text("참가하기"),
       ),
     );
   }

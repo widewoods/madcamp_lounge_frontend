@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const kPrimary = Color(0xFF4C46E5);
 const inputBorderColor = Color(0xFFD6D9E6);
-const scaffoldBackgroundColor = Color(0xFFF3F3F3);
+const scaffoldBackgroundColor = Color(0xFFF6F6F6);
 
 ThemeData buildTheme() {
   final base = ThemeData(
@@ -50,6 +50,7 @@ ThemeData buildTheme() {
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12),
+        side: BorderSide(color: inputBorderColor, width: 1.6),
       ),
     ),
 
@@ -61,14 +62,14 @@ ThemeData buildTheme() {
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: inputBorderColor, width: 1.3),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: inputBorderColor, width: 1.6),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: kPrimary, width: 1.6),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: kPrimary, width: 2.3),
       ),
     ),
 
@@ -85,6 +86,10 @@ ThemeData buildTheme() {
       backgroundColor: scaffoldBackgroundColor,
       insetPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))
+    ),
+
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: scaffoldBackgroundColor,
     )
   );
 }
