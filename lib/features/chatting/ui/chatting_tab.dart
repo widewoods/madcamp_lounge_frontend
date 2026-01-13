@@ -9,7 +9,7 @@ class ChattingTab extends ConsumerWidget {
 
   String _formatDate(DateTime? value) {
     if (value == null) return '';
-    return '${value.year}.${value.month.toString().padLeft(2, '0')}.'
+    return '${value.month.toString().padLeft(2, '0')}.'
         '${value.day.toString().padLeft(2, '0')} '
         '${value.hour.toString().padLeft(2, '0')}:'
         '${value.minute.toString().padLeft(2, '0')}';
@@ -52,7 +52,7 @@ class ChattingTab extends ConsumerWidget {
         : (room.partyId == null
             ? '채팅방 #${room.roomId}'
             : '파티 #${room.partyId}');
-    final createdAt = _formatDate(room.createdAt);
+    final lastMessageAt = _formatDate(room.lastMessageAt);
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -99,7 +99,7 @@ class ChattingTab extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    createdAt.isEmpty ? '생성 시간 없음' : createdAt,
+                    lastMessageAt.isEmpty ? '최근 메시지 없음' : lastMessageAt,
                     style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xFF6B7280),
