@@ -31,6 +31,8 @@ final allPlacesProvider = FutureProvider<Map<String, List<Place>>>((ref) async {
         name: r.title,
         address: r.address,
         distanceKm: r.distanceKm,
+        lat: r.lat,
+        lng: r.lon,
       ))
           .toList()
         ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));

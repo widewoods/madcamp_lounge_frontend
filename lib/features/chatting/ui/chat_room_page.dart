@@ -188,7 +188,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     final state = ref.watch(chatRoomDetailProvider(widget.roomId));
     final detail = state.detail;
     final title = detail?.partyTitle ?? '채팅방 ${widget.roomId}';
-
     return Scaffold(
       appBar: AppBar(
         title: Text(

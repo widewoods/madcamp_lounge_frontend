@@ -12,10 +12,8 @@ const ncpClientKey = String.fromEnvironment("X-NCP-APIGW-API-KEY");
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const naverClientId = String.fromEnvironment('NAVER_MAP_CLIENT_ID');
-
   await FlutterNaverMap().init(
-      clientId: naverClientId,
+      clientId: ncpClientID,
       onAuthFailed: (ex) {
         switch (ex) {
           case NQuotaExceededException(:final message):
@@ -29,7 +27,17 @@ void main() async {
         }
       });
 
-  runApp(const ProviderScope(child: MyApp()));
+
+  runApp(ProviderScope(observers: [Logger()], child: MyApp()));
+}
+
+class Logger extends ProviderObserver {
+  @override
+  void didUpdateProvider(ProviderBase provider, Object? prev, Object? next, ProviderContainer container) {
+    if (provider.name == 'createPartyDialogRequestProvider') {
+      debugPrint('UPDATED ${provider.name}: $prev -> $next');
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -38,7 +46,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    
+
     return MaterialApp(
       title: 'Madcamp Lounge',
       theme: buildTheme(),

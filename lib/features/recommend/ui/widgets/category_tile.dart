@@ -61,16 +61,6 @@ class CategoryTile extends StatelessWidget {
                         letterSpacing: -0.3,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      category.subtitle == null ? '' : category.subtitle!,
-                      style: const TextStyle(
-                        color: Color(0xFFF3F4F6),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
                   ],
                 ),
               ),

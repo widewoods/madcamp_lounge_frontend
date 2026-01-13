@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/recommend/place_map_page.dart';
+import '../../../party/party_dialog_request_provider.dart';
 import '../../model/place.dart';
 
-class PlaceCard extends StatelessWidget {
+class PlaceCard extends ConsumerWidget {
   const PlaceCard({super.key, required this.place});
 
   final Place place;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final primary = Theme.of(context).primaryColor;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
@@ -83,7 +86,7 @@ class PlaceCard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => PlaceMapPage(),
+                              builder: (_) => PlaceMapPage(lat: place.lat, lng: place.lng, placeName: place.name,),
                             ),
                           );
                         },
@@ -98,12 +101,13 @@ class PlaceCard extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => (),
+                        onPressed: () {
+                          ref.read(createPartyDialogRequestProvider.notifier).state = place;
+                        },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4)
                         ),
                         child: Text("파티 생성"),
-
                       ),
                     )
                   ],
@@ -131,15 +135,17 @@ class _infoRow extends StatelessWidget {
       children: [
         Icon(Icons.location_pin, size: 13,),
         const SizedBox(width: 3,),
-        Text(
-          place.address,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF6B7280),
-            overflow: TextOverflow.ellipsis
+        Expanded(
+          child: Text(
+            place.address,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF6B7280),
+              overflow: TextOverflow.ellipsis
+            ),
           ),
         ),
       ],

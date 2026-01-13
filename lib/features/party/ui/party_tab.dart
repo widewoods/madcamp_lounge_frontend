@@ -9,6 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/party_description.dart';
 
+import '../../../pages/main_page.dart';
+import '../../recommend/model/place.dart';
+import '../party_dialog_request_provider.dart';
+
 class PartyTab extends ConsumerStatefulWidget {
   const PartyTab({super.key});
 
@@ -17,37 +21,21 @@ class PartyTab extends ConsumerStatefulWidget {
 }
 
 class _PartyTabState extends ConsumerState<PartyTab> {
-  List<Party> _parties = [
-    // Demo data
-    // Party(
-    //   title: "보드게임 같이 하실 분!",
-    //   category: "보드게임",
-    //   time: "오늘 오후 7시",
-    //   locationText: "강남 보드게임카페",
-    //   currentCount: 3,
-    //   targetCount: 6,
-    //   imageUrl:
-    //   "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=400&q=80",
-    // ),
-    // Party(
-    //   title: "볼링 치러 가요~",
-    //   category: "볼링",
-    //   time: "내일 오후 3시",
-    //   locationText: "신촌 볼링장",
-    //   currentCount: 2,
-    //   targetCount: 4,
-    //   imageUrl:
-    //   "https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?auto=format&fit=crop&w=400&q=80",
-    // ),
-  ];
+
+  ProviderSubscription<int>? _sub;
+
+  List<Party> _parties = [];
 
   int _userId = -1;
 
-  Future<void> _openCreatePartyDialog() async {
+  Future<void> _openCreatePartyDialog({
+    String? initialPlace,
+    String? initialCategory,
+  }) async {
     final created = await showDialog<Party>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => const CreatePartyDialog(),
+      builder: (_) => CreatePartyDialog(initialPlace: initialPlace, initialCategory: initialCategory,),
     );
 
     if (created != null) {
@@ -145,10 +133,26 @@ class _PartyTabState extends ConsumerState<PartyTab> {
     super.initState();
     _getUserId();
     _getPartyList();
+
+    _sub = ref.listenManual<int>(bottomNavIndexProvider, (prev, next) {
+      if (next == 0 && prev != 0) {
+        _getPartyList();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    ref.listen<Place?>(createPartyDialogRequestProvider, (prev, next) {
+      if(next == null) return;
+      debugPrint('Listener fired event: $next');
+
+      Place initialPlace = ref.read(createPartyDialogRequestProvider.notifier).state!;
+      ref.read(createPartyDialogRequestProvider.notifier).state = null;
+      _openCreatePartyDialog(initialPlace: initialPlace.name, initialCategory: initialPlace.categoryId);
+    });
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PreferredSize(preferredSize: 
