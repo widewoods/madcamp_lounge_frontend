@@ -75,7 +75,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       return;
     }
 
-    const wsUrl = 'ws://localhost:8080/ws';
+    const wsUrl = 'ws://34.50.62.91:8080/ws';
     _stompClient = StompClient(
       config: StompConfig(
         url: wsUrl,

@@ -33,7 +33,20 @@ class ChattingTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildRoomTile(BuildContext context, ChatRoom room) {
+  Future<void> _openChatRoom(
+    BuildContext context,
+    WidgetRef ref,
+    ChatRoom room,
+  ) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChatRoomPage(roomId: room.roomId),
+      ),
+    );
+    ref.invalidate(chatRoomListProvider);
+  }
+
+  Widget _buildRoomTile(BuildContext context, WidgetRef ref, ChatRoom room) {
     final title = (room.partyTitle != null && room.partyTitle!.isNotEmpty)
         ? room.partyTitle!
         : (room.partyId == null
@@ -43,13 +56,7 @@ class ChattingTab extends ConsumerWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ChatRoomPage(roomId: room.roomId),
-          ),
-        );
-      },
+      onTap: () => _openChatRoom(context, ref, room),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -150,7 +157,7 @@ class ChattingTab extends ConsumerWidget {
                     itemCount: list.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) =>
-                        _buildRoomTile(context, list[index]),
+                        _buildRoomTile(context, ref, list[index]),
                   ),
           ),
         ),
