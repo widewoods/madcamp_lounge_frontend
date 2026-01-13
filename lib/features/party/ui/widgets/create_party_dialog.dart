@@ -6,7 +6,14 @@ import 'package:madcamp_lounge/features/party/ui/widgets/pick_time_sheet.dart';
 import 'package:madcamp_lounge/theme.dart';
 
 class CreatePartyDialog extends StatefulWidget {
-  const CreatePartyDialog({super.key});
+  const CreatePartyDialog({
+    super.key,
+    this.initialPlace,
+    this.initialCategory,
+  });
+
+  final String? initialPlace;
+  final String? initialCategory;
 
   @override
   State<CreatePartyDialog> createState() => _CreatePartyDialogState();
@@ -38,6 +45,8 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
 
   @override
   Widget build(BuildContext context) {
+    _locationCtrl.text = widget.initialPlace ?? '';
+    _categoryCtrl.text = widget.initialCategory ?? '';
     return Dialog(
       child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
