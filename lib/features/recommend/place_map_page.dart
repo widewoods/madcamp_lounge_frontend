@@ -11,17 +11,16 @@ class PlaceMapPage extends StatelessWidget {
     return Scaffold(
       body: NaverMap(
         options: NaverMapViewOptions(
-          contentPadding: safeAreaPadding, // 화면의 SafeArea에 중요 지도 요소가 들어가지 않도록 설정하는 Padding. 필요한 경우에만 사용하세요.
+          contentPadding: safeAreaPadding,
           initialCameraPosition: NCameraPosition(target: seoulCityHall, zoom: 14),
         ),
         onMapReady: (controller) {
           final marker = NMarker(
-            id: "city_hall", // Required
-            position: seoulCityHall, // Required
-            caption: NOverlayCaption(text: "서울시청"), // Optional
+            id: "city_hall",
+            position: seoulCityHall,
+            caption: NOverlayCaption(text: "서울시청"),
           );
-          controller.addOverlay(marker); // 지도에 마커를 추가
-          print("naver map is ready!");
+          controller.addOverlay(marker);
         },
       ),
     );
