@@ -4,8 +4,37 @@ import 'package:madcamp_lounge/features/chatting/model/chat_room.dart';
 import 'package:madcamp_lounge/features/chatting/state/chatting_state.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chat_room_page.dart';
 
-class ChattingTab extends ConsumerWidget {
+class ChattingTab extends ConsumerStatefulWidget {
   const ChattingTab({super.key});
+
+  @override
+  ConsumerState<ChattingTab> createState() => _ChattingTabState();
+}
+
+class _ChattingTabState extends ConsumerState<ChattingTab> {
+  ProviderSubscription<int>? _refreshSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshSub = ref.listenManual<int>(
+      chatTabRefreshTriggerProvider,
+      (_, __) {
+        if (!mounted) return;
+        ref.refresh(chatRoomListProvider);
+      },
+    );
+    Future.microtask(() {
+      if (!mounted) return;
+      ref.refresh(chatRoomListProvider);
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshSub?.close();
+    super.dispose();
+  }
 
   String _formatDate(DateTime? value) {
     if (value == null) return '';
@@ -35,7 +64,6 @@ class ChattingTab extends ConsumerWidget {
 
   Future<void> _openChatRoom(
     BuildContext context,
-    WidgetRef ref,
     ChatRoom room,
   ) async {
     await Navigator.of(context).push(
@@ -46,17 +74,19 @@ class ChattingTab extends ConsumerWidget {
     ref.invalidate(chatRoomListProvider);
   }
 
-  Widget _buildRoomTile(BuildContext context, WidgetRef ref, ChatRoom room) {
+  Widget _buildRoomTile(BuildContext context, ChatRoom room) {
     final title = (room.partyTitle != null && room.partyTitle!.isNotEmpty)
         ? room.partyTitle!
         : (room.partyId == null
             ? '채팅방 #${room.roomId}'
             : '파티 #${room.partyId}');
     final lastMessageAt = _formatDate(room.lastMessageAt);
+    final lastMessageContent = (room.lastMessageContent ?? '').trim();
+    final hasLastMessage = lastMessageContent.isNotEmpty || lastMessageAt.isNotEmpty;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => _openChatRoom(context, ref, room),
+      onTap: () => _openChatRoom(context, room),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -98,13 +128,35 @@ class ChattingTab extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    lastMessageAt.isEmpty ? '최근 메시지 없음' : lastMessageAt,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF6B7280),
+                  if (!hasLastMessage)
+                    const Text(
+                      '최근 메시지 없음',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF6B7280),
+                      ),
+                    )
+                  else ...[
+                    Text(
+                      lastMessageContent.isEmpty ? '메시지 없음' : lastMessageContent,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF6B7280),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      lastMessageAt,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -116,7 +168,7 @@ class ChattingTab extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final rooms = ref.watch(chatRoomListProvider);
 
     return Scaffold(
@@ -157,7 +209,7 @@ class ChattingTab extends ConsumerWidget {
                     itemCount: list.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) =>
-                        _buildRoomTile(context, ref, list[index]),
+                        _buildRoomTile(context, list[index]),
                   ),
           ),
         ),

@@ -4,6 +4,7 @@ class ChatRoom {
   final String? partyTitle;
   final DateTime? createdAt;
   final DateTime? lastMessageAt;
+  final String? lastMessageContent;
   final int unreadCount;
 
   ChatRoom({
@@ -12,6 +13,7 @@ class ChatRoom {
     required this.partyTitle,
     required this.createdAt,
     required this.lastMessageAt,
+    required this.lastMessageContent,
     required this.unreadCount,
   });
 
@@ -30,6 +32,7 @@ class ChatRoom {
       lastMessageAt: json['last_message_at'] == null
           ? null
           : DateTime.tryParse(json['last_message_at'].toString()),
+      lastMessageContent: json['last_message_content']?.toString(),
       unreadCount: (json['unread_count'] ?? 0) as int,
     );
   }

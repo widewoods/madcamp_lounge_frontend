@@ -8,6 +8,7 @@ class ChatRoomDetail {
   final DateTime? createdAt;
   final List<ChatMember> members;
   final List<ChatMessage> messages;
+  final int? lastReadMessageId;
   final DateTime? nextCursor;
   final int? nextCursorId;
   final bool hasMore;
@@ -19,6 +20,7 @@ class ChatRoomDetail {
     required this.createdAt,
     required this.members,
     required this.messages,
+    required this.lastReadMessageId,
     required this.nextCursor,
     required this.nextCursorId,
     required this.hasMore,
@@ -26,6 +28,7 @@ class ChatRoomDetail {
 
   ChatRoomDetail copyWith({
     List<ChatMessage>? messages,
+    int? lastReadMessageId,
     DateTime? nextCursor,
     int? nextCursorId,
     bool? hasMore,
@@ -37,6 +40,7 @@ class ChatRoomDetail {
       createdAt: createdAt,
       members: members,
       messages: messages ?? this.messages,
+      lastReadMessageId: lastReadMessageId ?? this.lastReadMessageId,
       nextCursor: nextCursor ?? this.nextCursor,
       nextCursorId: nextCursorId ?? this.nextCursorId,
       hasMore: hasMore ?? this.hasMore,
@@ -65,6 +69,9 @@ class ChatRoomDetail {
       createdAt: createdAt,
       members: members,
       messages: messages,
+      lastReadMessageId: json['last_read_message_id'] == null
+          ? null
+          : (json['last_read_message_id'] as num).toInt(),
       nextCursor: json['next_cursor'] == null
           ? null
           : DateTime.tryParse(json['next_cursor'].toString()),

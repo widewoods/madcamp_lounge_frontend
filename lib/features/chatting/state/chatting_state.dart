@@ -27,3 +27,5 @@ final chatRoomListProvider = FutureProvider<List<ChatRoom>>((ref) async {
   });
   return rooms;
 });
+
+final chatTabRefreshTriggerProvider = StateProvider<int>((ref) => 0);
