@@ -94,7 +94,7 @@ ThemeData buildTheme() {
 
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: scaffoldBackgroundColor,
-    )
+    ),
   );
 }
 

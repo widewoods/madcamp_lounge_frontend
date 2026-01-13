@@ -7,6 +7,8 @@ import 'package:madcamp_lounge/features/profile/profile_tab.dart';
 import 'package:madcamp_lounge/features/recommend/recommend_tab.dart';
 import 'package:madcamp_lounge/features/recommend/state/recommend_providers.dart';
 
+final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
+
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
@@ -30,6 +32,7 @@ class _MainPageState extends ConsumerState<MainPage> {
     if (index == 2) {
       ref.read(chatTabRefreshTriggerProvider.notifier).state++;
     }
+    ref.read(bottomNavIndexProvider.notifier).state = index;
   }
 
   @override
@@ -44,8 +47,9 @@ class _MainPageState extends ConsumerState<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:Center(
-        child: _tabs.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _tabs,
       ),
       bottomNavigationBar: Theme(data: Theme.of(context).copyWith(
         splashColor: Colors.transparent,
