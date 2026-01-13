@@ -1,27 +1,27 @@
 class RecommendCategory {
-  const RecommendCategory({
+  RecommendCategory({
     required this.id,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.imageUrl,
     required this.keyword,
   });
 
   final String id;
   final String title;
-  final String subtitle;
+  String? subtitle;
   final String imageUrl;
   final String keyword;
 }
 
-const recommendCategories = <RecommendCategory>[
+final recommendCategories = <RecommendCategory>[
   RecommendCategory(
     id: 'boardgame',
     title: '보드게임',
     subtitle: '3개 장소',
     imageUrl:
     'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=1200&q=80',
-    keyword: '보드게임카페',
+    keyword: '보드게임',
   ),
   RecommendCategory(
     id: 'bowling',
@@ -34,7 +34,7 @@ const recommendCategories = <RecommendCategory>[
   RecommendCategory(
     id: 'pc',
     title: 'PC방',
-    subtitle: '3개 장소',
+    subtitle: null,
     imageUrl:
     'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=1200&q=80',
     keyword: 'PC방',
