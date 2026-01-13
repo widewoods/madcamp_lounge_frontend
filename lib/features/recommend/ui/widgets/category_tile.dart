@@ -6,10 +6,12 @@ class CategoryTile extends StatelessWidget {
     super.key,
     required this.category,
     required this.onTap,
+    required this.gradientColor
   });
 
   final RecommendCategory category;
   final VoidCallback onTap;
+  final Color gradientColor;
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +38,13 @@ class CategoryTile extends StatelessWidget {
               ),
 
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(0x11000000),
-                      Color(0x66000000),
+                      gradientColor.withAlpha(30),
+                      gradientColor.withAlpha(80),
                     ],
                   ),
                 ),

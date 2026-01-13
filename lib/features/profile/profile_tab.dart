@@ -11,6 +11,8 @@ import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
 import 'package:madcamp_lounge/pages/login.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 
+import '../../theme.dart';
+
 class ProfileTab extends ConsumerStatefulWidget {
   const ProfileTab({super.key});
 
@@ -147,11 +149,11 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
       padding: const EdgeInsets.only(bottom: 5),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w800,
           letterSpacing: -0.2,
-          color: Color(0xFF4C46E5),
+          color: Color(0xFF5A5A5A),
         ),
       ),
     );
@@ -199,7 +201,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                           ),
                           child: const Icon(
                             Icons.person_outline_rounded,
-                            size: 42,
+                            size: 50,
                             color: kPrimary,
                           ),
                         ),
@@ -217,7 +219,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                                   color: Color(0xFF111827),
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              SizedBox(height: 2),
                               Text(
                                 "@${_idCtrl.text}",
                                 style: TextStyle(
@@ -226,17 +228,22 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                                   color: Color(0xFF6B7280),
                                 ),
                               ),
+                              SizedBox(height: 4),
+                              Text(
+                                _introductionCtrl.text,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF3E3E3E),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 10),
-
-                    // 폼 영역
-                    _label("아이디"),
-                    FixedField(ctrl: _idCtrl,),
+                    const SizedBox(height: 16),
 
                     const SizedBox(height: 5),
                     _label("이름"),
@@ -251,20 +258,24 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                     FixedField(ctrl: _mbtiCtrl,),
 
                     const SizedBox(height: 5),
-                    _label("학교"),
-                    FixedField(ctrl: _schoolCtrl),
-
-                    const SizedBox(height: 5),
                     _label("취미"),
                     EditableField(ctrl: _hobbyCtrl, isEditing: _isEditing,),
+
+                    const SizedBox(height: 5),
+                    _label("학교"),
+                    FixedField(ctrl: _schoolCtrl),
 
                     const SizedBox(height: 5),
                     _label("분반"),
                     FixedField(ctrl: _classCtrl),
 
                     const SizedBox(height: 5),
-                    _label("한마디"),
-                    EditableField(ctrl: _introductionCtrl, isEditing: _isEditing,),
+                    if(_isEditing)
+                      _label("한마디"),
+                    if(_isEditing)
+                      EditableField(ctrl: _introductionCtrl, isEditing: _isEditing,),
+
+
                     const SizedBox(height: 20,),
 
                     Row(

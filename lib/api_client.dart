@@ -10,7 +10,7 @@ final apiClientProvider = Provider<ApiClient>((ref) => ApiClient(ref));
 class ApiClient {
   ApiClient(this._ref, {FlutterSecureStorage? storage, String? baseUrl})
       : _storage = storage ?? const FlutterSecureStorage(),
-        _baseUrl = baseUrl ?? 'http://10.0.2.2:8080';
+        _baseUrl = baseUrl ?? 'http://34.50.62.91:8080';
 
   final Ref _ref;
   final FlutterSecureStorage _storage;
@@ -62,12 +62,14 @@ class ApiClient {
   Future<http.Response> delete(
     String path, {
     Map<String, String>? headers,
+    Map<String, String>? body,
     bool useAuth = true,
   }) async {
     return _send(
       'DELETE',
       path,
       headers: headers,
+      body: body,
       useAuth: useAuth,
     );
   }

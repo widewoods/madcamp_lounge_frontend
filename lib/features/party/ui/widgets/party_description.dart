@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
 
 import '../../../../api_client.dart';
+import '../../party_list_provider.dart';
 
 class PartyDescription extends ConsumerStatefulWidget {
   const PartyDescription({super.key, required this.party});
@@ -34,6 +35,38 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
     }
   }
 
+  Future<void> _quitParty() async {
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.delete(
+        '/party/exit',
+        body: {
+          'party_id': widget.party.partyId.toString(),
+        }
+    );
+
+    if(!mounted) return;
+
+    if(res.statusCode == 200){
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('파티에서 탈퇴했습니다.'), duration: Duration(seconds: 1),),
+      );
+    }
+    else if(res.statusCode == 409){
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('방장은 탈퇴할 수 없습니다.'), duration: Duration(seconds: 1),),
+      );
+    }
+    else{
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('파티 탈퇴 실패 에러: ${res.statusCode}')),
+      );
+    }
+    ref.invalidate(partyListProvider);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +80,18 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                widget.party.title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.party.title,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  IconButton(onPressed: (){
+                    Navigator.of(context).pop();
+                  }, icon: Icon(Icons.close))
+                ],
               ),
               const SizedBox(height: 10),
 
@@ -72,7 +114,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
               ),
               const SizedBox(height: 10),
 
-              if (widget.party.content!.isNotEmpty)
+              if (widget.party.content != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
@@ -125,23 +167,30 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
 
-                  Expanded(
-                    child: Align(
-                      alignment: AlignmentGeometry.centerRight,
-                      child: IconButton(
-                        //Todo: OnPressed - 나가기
-                          onPressed: () {},
-                          icon: Icon(Icons.logout_outlined),
+                  if (widget.party.joined)
+                    Expanded(
+                      child: Align(
+                        alignment: AlignmentGeometry.centerRight,
+                        child: IconButton(
+                            onPressed: _quitParty,
+                            icon: Icon(Icons.logout_outlined),
+                        ),
                       ),
-                    ),
-                  )
+                    )
 
                 ],
               ),
 
               const SizedBox(height: 10),
-              for (Map<String, dynamic> member in widget.party.members)
-                _MemberProfile(infoBackgroundColor: infoBackgroundColor, kPrimary: kPrimary, member: member),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    for (Map<String, dynamic> member in widget.party.members)
+                      _MemberProfile(infoBackgroundColor: infoBackgroundColor, kPrimary: kPrimary, member: member),
+                  ],
+                ),
+              ),
+
 
               const SizedBox(height: 10,),
 
@@ -153,7 +202,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                   onPressed: () {
                     _closeParty();
                   },
-                  child: Text("파티 닫기"),
+                  child: Text("파티 삭제"),
                 ),
             ],
           ),
@@ -165,7 +214,6 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
 
 class _MemberProfile extends StatelessWidget {
   const _MemberProfile({
-    super.key,
     required this.infoBackgroundColor,
     required this.kPrimary,
     required this.member,
@@ -177,71 +225,75 @@ class _MemberProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 10,
-      ),
-      decoration: BoxDecoration(
-        color: infoBackgroundColor,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 35,
-            height: 35,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: kPrimary.withValues(alpha: 0.10),
-            ),
-            child: Align(
-              alignment: AlignmentGeometry.center,
-              child: Text(
-                member['name'][0],
-                style: TextStyle(
-                  color: kPrimary,
-                  fontWeight: FontWeight.bold,
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 10,
+          ),
+          decoration: BoxDecoration(
+            color: infoBackgroundColor,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 35,
+                height: 35,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: kPrimary.withValues(alpha: 0.10),
+                ),
+                child: Align(
+                  alignment: AlignmentGeometry.center,
+                  child: Text(
+                    member['name'][0],
+                    style: TextStyle(
+                      color: kPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    member['name'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        member['name'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
 
-                ),
-                const SizedBox(height: 3),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    member['class_section'],
-                    style: TextStyle(
-                      fontSize: 11,
                     ),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+                    const SizedBox(height: 3),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        member['class_section'],
+                        style: TextStyle(
+                          fontSize: 11,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+        const SizedBox(height: 4)
+      ],
     );
   }
 }
 
 class _infoRow extends StatelessWidget {
   const _infoRow({
-    super.key,
     required this.info,
     required this.infoText,
     required this.icon,
