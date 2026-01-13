@@ -75,7 +75,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       return;
     }
 
-    const wsUrl = 'ws://34.50.62.91:8080/ws';
+    const wsUrl = 'ws://10.0.2.2:8080/ws';
     _stompClient = StompClient(
       config: StompConfig(
         url: wsUrl,
@@ -160,25 +160,53 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     final isMine = _userId != null && message.senderId == _userId;
     final bubbleColor = isMine ? _primary : const Color(0xFFF0F2F8);
     final textColor = isMine ? Colors.white : const Color(0xFF111827);
-    final align = isMine ? Alignment.centerRight : Alignment.centerLeft;
+
+    final bubble = Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: bubbleColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        message.content,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+
+    if (isMine) {
+      return Align(
+        alignment: Alignment.centerRight,
+        child: bubble,
+      );
+    }
 
     return Align(
-      alignment: align,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: bubbleColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          message.content,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            margin: const EdgeInsets.only(right: 8, top: 6),
+            decoration: const BoxDecoration(
+              color: Color(0xFFE6ECFF),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.person_outline_rounded,
+              size: 18,
+              color: Color(0xFF4C46E5),
+            ),
           ),
-        ),
+          Flexible(child: bubble),
+        ],
       ),
     );
   }
@@ -187,12 +215,35 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(chatRoomDetailProvider(widget.roomId));
     final detail = state.detail;
-    final title = detail?.partyTitle ?? '채팅방 ${widget.roomId}';
+    final baseTitle = detail?.partyTitle ?? '채팅방 ${widget.roomId}';
+    final memberCount = detail?.members.length ?? 0;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w800),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                baseTitle,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(
+              Icons.people_outline,
+              size: 28,
+              color: Color(0xFF6B7280),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '$memberCount',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+          ],
         ),
       ),
       body: SafeArea(

@@ -12,7 +12,18 @@ final chatRoomListProvider = FutureProvider<List<ChatRoom>>((ref) async {
   }
 
   final data = jsonDecode(res.body) as List<dynamic>;
-  return data
+  final rooms = data
       .map((item) => ChatRoom.fromJson(item as Map<String, dynamic>))
       .toList();
+  rooms.sort((a, b) {
+    final aTime = a.lastMessageAt ?? a.createdAt;
+    final bTime = b.lastMessageAt ?? b.createdAt;
+    if (aTime == null && bTime == null) {
+      return b.roomId.compareTo(a.roomId);
+    }
+    if (aTime == null) return 1;
+    if (bTime == null) return -1;
+    return bTime.compareTo(aTime);
+  });
+  return rooms;
 });
