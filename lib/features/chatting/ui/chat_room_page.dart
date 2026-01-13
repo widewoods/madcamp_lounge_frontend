@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_message.dart';
+import 'package:madcamp_lounge/features/chatting/model/chat_member.dart';
 import 'package:madcamp_lounge/features/chatting/state/chat_room_detail_state.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
@@ -75,7 +76,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       return;
     }
 
-    const wsUrl = 'ws://10.0.2.2:8080/ws';
+    const wsUrl = 'ws://34.50.62.91:8080/ws';
     _stompClient = StompClient(
       config: StompConfig(
         url: wsUrl,
@@ -147,6 +148,109 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     });
   }
 
+  void _showMembers(List<ChatMember> members) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black45,
+      builder: (context) {
+        return Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 56),
+            child: Material(
+              color: Colors.white,
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(24)),
+              child: SafeArea(
+                child: Container(
+                  width: 280,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '참여 멤버',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (members.isEmpty)
+                        const Text(
+                          '참여자가 없습니다.',
+                          style: TextStyle(color: Color(0xFF6B7280)),
+                        )
+                      else
+                        Flexible(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: members.length,
+                            separatorBuilder: (_, __) => const Divider(height: 20),
+                            itemBuilder: (context, index) {
+                              final member = members[index];
+                              return Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFE6ECFF),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.person_outline_rounded,
+                                      color: Color(0xFF4C46E5),
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          member.name,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          member.classSection,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF6B7280),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    member.nickname,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _detailSub?.close();
@@ -156,10 +260,15 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     super.dispose();
   }
 
-  Widget _buildBubble(ChatMessage message) {
+  Widget _buildBubble(ChatMessage message, {String? senderName}) {
     final isMine = _userId != null && message.senderId == _userId;
     final bubbleColor = isMine ? _primary : const Color(0xFFF0F2F8);
     final textColor = isMine ? Colors.white : const Color(0xFF111827);
+
+    String _formatTime(DateTime value) {
+      return '${value.hour.toString().padLeft(2, '0')}:'
+          '${value.minute.toString().padLeft(2, '0')}';
+    }
 
     final bubble = Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -181,7 +290,21 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     if (isMine) {
       return Align(
         alignment: Alignment.centerRight,
-        child: bubble,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(message.sentAt),
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFF9AA0AE),
+              ),
+            ),
+            const SizedBox(width: 6),
+            bubble,
+          ],
+        ),
       );
     }
 
@@ -205,7 +328,39 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
               color: Color(0xFF4C46E5),
             ),
           ),
-          Flexible(child: bubble),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (senderName != null && senderName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      senderName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Flexible(child: bubble),
+                    const SizedBox(width: 6),
+                    Text(
+                      _formatTime(message.sentAt),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF9AA0AE),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -217,6 +372,11 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     final detail = state.detail;
     final baseTitle = detail?.partyTitle ?? '채팅방 ${widget.roomId}';
     final memberCount = detail?.members.length ?? 0;
+    final memberNameById = detail == null
+        ? const <int, String>{}
+        : {
+            for (final member in detail.members) member.userId: member.name,
+          };
 
     return Scaffold(
       appBar: AppBar(
@@ -229,18 +389,28 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(
-              Icons.people_outline,
-              size: 28,
-              color: Color(0xFF6B7280),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              '$memberCount',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF6B7280),
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: detail == null
+                  ? null
+                  : () => _showMembers(detail.members),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.people_outline,
+                    size: 28,
+                    color: Color(0xFF6B7280),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$memberCount',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -282,9 +452,17 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                                       ),
                                     );
                                   }
-                                  return _buildBubble(detail.messages[index - 1]);
+                                  final message = detail.messages[index - 1];
+                                  return _buildBubble(
+                                    message,
+                                    senderName: memberNameById[message.senderId],
+                                  );
                                 }
-                                return _buildBubble(detail.messages[index]);
+                                final message = detail.messages[index];
+                                return _buildBubble(
+                                  message,
+                                  senderName: memberNameById[message.senderId],
+                                );
                               },
                             ),
             ),
