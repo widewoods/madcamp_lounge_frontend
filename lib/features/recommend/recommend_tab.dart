@@ -26,8 +26,6 @@ class RecommendTab extends ConsumerWidget {
                     final c = recommendCategories[index];
                     return CategoryTile(
                       category: c,
-
-                      // Todo: 타일 클릭 시 해당 페이지로 이동
                       onTap: () {
                         Navigator.of(context).push(
                             MaterialPageRoute(
@@ -43,7 +41,7 @@ class RecommendTab extends ConsumerWidget {
                   crossAxisCount: 2,
                   mainAxisSpacing: 14,
                   crossAxisSpacing: 14,
-                  childAspectRatio: 2.1, // 스샷처럼 가로로 긴 카드
+                  childAspectRatio: 2.1,
                 ),
               ),
             ),

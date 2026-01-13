@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chatting_tab.dart';
 import 'package:madcamp_lounge/features/party/ui/party_tab.dart';
 import 'package:madcamp_lounge/features/profile/profile_tab.dart';
 import 'package:madcamp_lounge/features/recommend/recommend_tab.dart';
+import 'package:madcamp_lounge/features/recommend/state/recommend_providers.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   var _selectedIndex = 0;
   static const List<Widget> _tabs = <Widget>[
     PartyTab(),
@@ -24,6 +26,15 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(allPlacesProvider.future);
+      }
+    );
   }
 
   @override

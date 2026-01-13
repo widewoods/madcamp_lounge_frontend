@@ -4,12 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/auth_gate.dart';
 import 'package:madcamp_lounge/theme.dart';
 
+const naverSearchClientID = String.fromEnvironment('NAVER_SEARCH_CLIENT_ID');
+const naverSearchClientSecret = String.fromEnvironment('NAVER_SEARCH_CLIENT_SECRET');
+const ncpClientID = String.fromEnvironment("X-NCP-APIGW-API-KEY-ID");
+const ncpClientKey = String.fromEnvironment("X-NCP-APIGW-API-KEY");
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   const naverClientId = String.fromEnvironment('NAVER_MAP_CLIENT_ID');
-
-  assert(naverClientId.isNotEmpty, 'NAVER_MAP_CLIENT_ID가 비어있습니다. --dart-define을 확인하세요.');
 
   await FlutterNaverMap().init(
       clientId: naverClientId,
@@ -35,6 +38,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       title: 'Madcamp Lounge',
       theme: buildTheme(),
