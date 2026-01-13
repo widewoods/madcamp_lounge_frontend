@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/change_password_dialog.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
 import 'package:madcamp_lounge/pages/login.dart';
+import 'package:madcamp_lounge/state/auth_state.dart';
 
 class ProfileTab extends ConsumerStatefulWidget {
   const ProfileTab({super.key});
@@ -95,6 +97,29 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
       context: context,
       barrierDismissible: true,
       builder: (_) => const ChangePasswordDialog(),
+    );
+  }
+
+  Future<void> _logout() async {
+    final storage = const FlutterSecureStorage();
+    final refreshToken = await storage.read(key: 'refreshToken');
+
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      final apiClient = ref.read(apiClientProvider);
+      await apiClient.postJson(
+        '/auth/logout',
+        body: {'refresh_token': refreshToken},
+        useAuth: false,
+      );
+    }
+
+    await storage.delete(key: 'refreshToken');
+    ref.read(accessTokenProvider.notifier).state = null;
+
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => LoginPage()),
+      (route) => false,
     );
   }
 
@@ -293,9 +318,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
-                },
+                onPressed: _logout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                 ),
