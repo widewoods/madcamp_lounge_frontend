@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_message.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_member.dart';
+import 'package:madcamp_lounge/features/chatting/model/chat_room_detail.dart';
 import 'package:madcamp_lounge/features/chatting/state/chat_room_detail_state.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
@@ -23,9 +25,16 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   final _scrollController = ScrollController();
   final _inputController = TextEditingController();
+  final Map<int, GlobalKey> _messageKeys = {};
+  final _readMarkerKey = GlobalKey();
   StompClient? _stompClient;
   bool _stompConnected = false;
+  bool _didInitialScroll = false;
+  bool _allowLoadMore = false;
+  bool _loadingMoreRequest = false;
+  DateTime? _lastLoadMoreAt;
   int? _userId;
+  int? _pendingReadMessageId;
   ProviderSubscription<ChatRoomDetailState>? _detailSub;
 
   @override
@@ -40,8 +49,13 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         if (previous?.detail == null && next.detail != null) {
           final messages = next.detail!.messages;
           if (messages.isNotEmpty) {
-            _sendRead(messages.last.messageId);
-            _scrollToBottom();
+            final lastMessageId = messages.first.messageId;
+            if (_stompConnected) {
+              _sendRead(lastMessageId);
+            } else {
+              _pendingReadMessageId = lastMessageId;
+            }
+            _scrollToInitialPosition(next.detail!);
           }
         }
       },
@@ -65,8 +79,32 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   void _handleScroll() {
     if (!_scrollController.hasClients) return;
-    if (_scrollController.position.pixels <= 80) {
-      ref.read(chatRoomDetailProvider(widget.roomId).notifier).loadMore();
+    final position = _scrollController.position;
+    final nearTop = position.extentAfter <= 120;
+    final scrollingUp = position.userScrollDirection == ScrollDirection.reverse;
+    if (nearTop && scrollingUp && !_loadingMoreRequest) {
+      _loadMoreWithAnchor();
+    }
+  }
+
+  Future<void> _loadMoreWithAnchor() async {
+    if (_loadingMoreRequest) return;
+
+    // 중복 호출 방지를 위한 시간 간격 체크
+    final now = DateTime.now();
+    if (_lastLoadMoreAt != null &&
+        now.difference(_lastLoadMoreAt!) < const Duration(milliseconds: 500)) {
+      return;
+    }
+
+    _loadingMoreRequest = true;
+    _lastLoadMoreAt = now;
+
+    // 단순히 호출만 하면 됩니다. Flutter가 위치를 지켜줍니다.
+    await ref.read(chatRoomDetailProvider(widget.roomId).notifier).loadMore();
+
+    if (mounted) {
+      _loadingMoreRequest = false;
     }
   }
 
@@ -76,7 +114,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       return;
     }
 
-    const wsUrl = 'ws://34.50.62.91:8080/ws';
+    const wsUrl = 'ws://10.0.2.2:8080/ws';
     _stompClient = StompClient(
       config: StompConfig(
         url: wsUrl,
@@ -107,6 +145,19 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         _scrollToBottom();
       },
     );
+    _stompClient?.subscribe(
+      destination: '/topic/rooms/${widget.roomId}/read',
+      callback: (_) {},
+    );
+    if (_pendingReadMessageId != null) {
+      _sendRead(_pendingReadMessageId!);
+      _pendingReadMessageId = null;
+    } else {
+      final detail = ref.read(chatRoomDetailProvider(widget.roomId)).detail;
+      if (detail != null && detail.messages.isNotEmpty) {
+        _sendRead(detail.messages.first.messageId);
+      }
+    }
   }
 
   void _onStompError(StompFrame frame) {
@@ -140,11 +191,55 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     if (!_scrollController.hasClients) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+      final minExtent = _scrollController.position.minScrollExtent;
+      final maxExtent = _scrollController.position.maxScrollExtent;
+      if (maxExtent == 0) {
+        Future.microtask(_scrollToBottom);
+        return;
+      }
+      _scrollController.jumpTo(minExtent);
+      _allowLoadMore = true;
+    });
+  }
+
+  void _scrollToInitialPosition(ChatRoomDetail detail) {
+    if (_didInitialScroll) return;
+    _didInitialScroll = true;
+    _scrollToBottom();
+  }
+
+  void _scrollToReadMarker(int lastReadId) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _readMarkerKey.currentContext;
+      if (context == null) {
+        _scrollToMessage(lastReadId);
+        return;
+      }
+      Scrollable.ensureVisible(
+        context,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
+        alignment: 0.2,
       );
+      _allowLoadMore = true;
+    });
+  }
+
+  void _scrollToMessage(int messageId) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final key = _messageKeys[messageId];
+      final context = key?.currentContext;
+      if (context == null) {
+        _scrollToBottom();
+        return;
+      }
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        alignment: 0.2,
+      );
+      _allowLoadMore = true;
     });
   }
 
@@ -260,6 +355,128 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     super.dispose();
   }
 
+  Future<Map<String, dynamic>?> _fetchProfile(int userId) async {
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.get('/profile/$userId');
+    if (res.statusCode != 200) {
+      return null;
+    }
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
+  void _showProfileSheet(int userId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: FutureBuilder<Map<String, dynamic>?>(
+            future: _fetchProfile(userId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              final data = snapshot.data;
+              if (data == null) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text(
+                    '프로필을 불러오지 못했습니다.',
+                    style: TextStyle(color: Color(0xFF6B7280)),
+                  ),
+                );
+              }
+              final nickname = data['nickname']?.toString() ?? '';
+              final classSection = data['class_section']?.toString() ?? '';
+              final mbti = data['mbti']?.toString() ?? '';
+              final hobby = data['hobby']?.toString() ?? '';
+              final introduction = data['introduction']?.toString() ?? '';
+
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE6ECFF),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.person_outline_rounded,
+                            color: Color(0xFF4C46E5),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            nickname.isEmpty ? '프로필' : nickname,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildProfileRow('분반', classSection),
+                    _buildProfileRow('MBTI', mbti),
+                    _buildProfileRow('취미', hobby),
+                    _buildProfileRow('소개', introduction),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value.isEmpty ? '-' : value,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBubble(ChatMessage message, {String? senderName}) {
     final isMine = _userId != null && message.senderId == _userId;
     final bubbleColor = isMine ? _primary : const Color(0xFFF0F2F8);
@@ -314,18 +531,22 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            margin: const EdgeInsets.only(right: 8, top: 6),
-            decoration: const BoxDecoration(
-              color: Color(0xFFE6ECFF),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.person_outline_rounded,
-              size: 18,
-              color: Color(0xFF4C46E5),
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => _showProfileSheet(message.senderId),
+            child: Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.only(right: 8, top: 6),
+              decoration: const BoxDecoration(
+                color: Color(0xFFE6ECFF),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Color(0xFF4C46E5),
+              ),
             ),
           ),
           Flexible(
@@ -363,6 +584,30 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMessageList(
+    ChatRoomDetail detail,
+    Map<int, String> memberNameById,
+    bool loadingMore,
+  ) {
+    // 최신순으로 정렬된 메시지 리스트 (index 0이 가장 최신)
+    final messages = detail.messages;
+
+    return ListView.builder(
+      controller: _scrollController,
+      reverse: true, // 필수: 하단이 시작점
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: messages.length,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        // reverse: true 이므로 위쪽으로 갈수록 index가 커짐
+        return _buildBubble(
+          message,
+          senderName: memberNameById[message.senderId],
+        );
+      },
     );
   }
 
@@ -420,51 +665,25 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         child: Column(
           children: [
             Expanded(
-              child: state.loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : state.error != null
-                      ? Center(
-                          child: Text(
-                            state.error!,
-                            style: const TextStyle(color: Color(0xFF6B7280)),
-                          ),
-                        )
-                      : detail == null
-                          ? const SizedBox.shrink()
-                          : ListView.builder(
-                              controller: _scrollController,
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                              itemCount: detail.messages.length +
-                                  (state.loadingMore ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (state.loadingMore) {
-                                  if (index == 0) {
-                                    return const Padding(
-                                      padding: EdgeInsets.only(bottom: 12),
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  final message = detail.messages[index - 1];
-                                  return _buildBubble(
-                                    message,
-                                    senderName: memberNameById[message.senderId],
-                                  );
-                                }
-                                final message = detail.messages[index];
-                                return _buildBubble(
-                                  message,
-                                  senderName: memberNameById[message.senderId],
-                                );
-                              },
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: state.loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : state.error != null
+                        ? Center(
+                            child: Text(
+                              state.error!,
+                              style: const TextStyle(color: Color(0xFF6B7280)),
                             ),
+                          )
+                        : detail == null
+                            ? const SizedBox.shrink()
+                            : _buildMessageList(
+                                detail,
+                                memberNameById,
+                                state.loadingMore,
+                              ),
+              ),
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),

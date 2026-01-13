@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madcamp_lounge/features/chatting/state/chatting_state.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chatting_tab.dart';
 import 'package:madcamp_lounge/features/party/ui/party_tab.dart';
 import 'package:madcamp_lounge/features/profile/profile_tab.dart';
@@ -26,6 +27,9 @@ class _MainPageState extends ConsumerState<MainPage> {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 2) {
+      ref.read(chatTabRefreshTriggerProvider.notifier).state++;
+    }
   }
 
   @override
