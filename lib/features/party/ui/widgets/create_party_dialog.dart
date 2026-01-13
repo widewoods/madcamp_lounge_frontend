@@ -27,10 +27,19 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
   final _locationCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
 
+  static const double _formPadding = 11;
+
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
-  int _capacity = 6;
+  int _capacity = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    _locationCtrl.text = widget.initialPlace ?? '';
+    _categoryCtrl.text = widget.initialCategory ?? '';
+  }
 
   @override
   void dispose() {
@@ -45,8 +54,15 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
 
   @override
   Widget build(BuildContext context) {
-    _locationCtrl.text = widget.initialPlace ?? '';
-    _categoryCtrl.text = widget.initialCategory ?? '';
+    final title = _titleCtrl.text.trim();
+    final category = _categoryCtrl.text.trim();
+    final date = _dateCtrl.text.trim();
+    final time = _timeCtrl.text.trim();
+    final location = _locationCtrl.text.trim();
+    final content = _contentCtrl.text.trim();
+
+    bool disabled = title.isEmpty || category.isEmpty || date.isEmpty || time.isEmpty || location.isEmpty || content.isEmpty;
+
     return Dialog(
       child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
@@ -61,7 +77,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                       child: Text(
                         "파티 만들기",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.2,
                         ),
@@ -73,7 +89,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
 
                 const Text("제목", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
@@ -82,22 +98,13 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                   decoration: inputDecorationWithHint("파티 제목"),
                   textInputAction: TextInputAction.next,
                 ),
-                const SizedBox(height: 12),
-
-                const Text("카테고리", style: TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _categoryCtrl,
-                  decoration: inputDecorationWithHint("예: 보드게임"),
-                  textInputAction: TextInputAction.next,
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: _formPadding),
 
                 const Text("날짜", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 TextField(
                     controller: _dateCtrl,
-                    decoration: inputDecorationWithHint("날짜 선택"),
+                    decoration: inputDecorationWithHintIcon("날짜를 선택 하세요", Icon(Icons.calendar_today_outlined)),
                     textInputAction: TextInputAction.next,
                     readOnly: true,
                     onTap: () async {
@@ -110,24 +117,26 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     }
                 ),
 
+                const SizedBox(height: _formPadding),
+
                 const Text("시간", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _timeCtrl,
-                  decoration: inputDecorationWithHint("시간 선택"),
-                  textInputAction: TextInputAction.next,
-                  readOnly: true,
-                  onTap: () async {
-                    final picked = await showTimeGridSheet(context);
-                    if (picked == null) return;
-                    setState(() {
-                      _timeCtrl.text =
-                      "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
-                    });
-                    _selectedTime = picked;
-                  }
+                    controller: _timeCtrl,
+                    decoration: inputDecorationWithHintIcon("시간을 선택하세요", Icon(Icons.alarm)),
+                    textInputAction: TextInputAction.next,
+                    readOnly: true,
+                    onTap: () async {
+                      final picked = await showTimeGridSheet(context);
+                      if (picked == null) return;
+                      setState(() {
+                        _timeCtrl.text =
+                        "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
+                      });
+                      _selectedTime = picked;
+                    }
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: _formPadding),
 
                 const Text("장소", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
@@ -136,7 +145,17 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                   decoration: inputDecorationWithHint("만날 장소"),
                   textInputAction: TextInputAction.done,
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: _formPadding),
+
+                const Text("카테고리", style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _categoryCtrl,
+                  decoration: inputDecorationWithHint("예: 보드게임"),
+                  textInputAction: TextInputAction.next,
+                ),
+
+                const SizedBox(height: _formPadding),
 
                 const Text("설명", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
@@ -145,7 +164,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                   decoration: inputDecorationWithHint("설명 한두마디"),
                   textInputAction: TextInputAction.done,
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: _formPadding),
 
                 // 인원 선택
                 Row(
@@ -182,7 +201,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _submit,
+                        onPressed: disabled ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -207,11 +226,6 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     final time = _timeCtrl.text.trim();
     final location = _locationCtrl.text.trim();
     final content = _contentCtrl.text.trim();
-
-    if (title.isEmpty || category.isEmpty || time.isEmpty || date.isEmpty || location.isEmpty) {
-      // 입력 칸 비었을 시 reject
-      return;
-    }
 
     final party = Party(
       partyId: 0,

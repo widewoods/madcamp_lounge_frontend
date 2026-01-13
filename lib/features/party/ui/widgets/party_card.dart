@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
+import 'package:madcamp_lounge/features/party/party_list_provider.dart';
 
+import '../../../../pages/main_page.dart';
 import '../../model/party.dart';
 
 class PartyCard extends StatefulWidget {
@@ -29,10 +31,10 @@ class _PartyCardState extends State<PartyCard> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 18,
+              color: Color(0x14000000).withValues(alpha: 0.04),
+              blurRadius: 20,
               offset: Offset(0, 10),
             ),
           ],
@@ -140,21 +142,18 @@ class _JoinButtonState extends ConsumerState<JoinButton> {
   Future<void> _onJoin() async {
     final apiClient = ref.read(apiClientProvider);
     final res = await apiClient.postJson(
-      '/party/join',
-      body: {
-        'party_id': widget.party.partyId,
-      }
+        '/party/join',
+        body: {
+          'party_id': widget.party.partyId,
+        }
     );
 
     if(!mounted) return;
 
     if(res.statusCode == 200){
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('참가 완료')),
+        SnackBar(content: Text('파티에 참가했습니다.'), duration: Duration(seconds: 1),),
       );
-      setState(() {
-        widget.party.joined = true;
-      });
     }
     else if(res.statusCode == 409){
       ScaffoldMessenger.of(context).showSnackBar(
@@ -166,15 +165,18 @@ class _JoinButtonState extends ConsumerState<JoinButton> {
         SnackBar(content: Text('Failed: ${res.statusCode}')),
       );
     }
+    ref.invalidate(partyListProvider);
   }
 
   @override
   Widget build(BuildContext context) {
+    bool disabled = widget.party.joined;
+
     return SizedBox(
       height: 48,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: widget.joined ? null : _onJoin,
+        onPressed: disabled ? null : _onJoin,
         style: ElevatedButton.styleFrom(
           textStyle: TextStyle(
             fontSize: 15,

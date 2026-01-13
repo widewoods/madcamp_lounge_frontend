@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
+import 'package:madcamp_lounge/features/party/party_list_provider.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/create_party_dialog.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/party_appbar.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/party_card.dart';
@@ -23,10 +24,6 @@ class PartyTab extends ConsumerStatefulWidget {
 class _PartyTabState extends ConsumerState<PartyTab> {
 
   ProviderSubscription<int>? _sub;
-
-  List<Party> _parties = [];
-
-  int _userId = -1;
 
   Future<void> _openCreatePartyDialog({
     String? initialPlace,
@@ -60,7 +57,7 @@ class _PartyTabState extends ConsumerState<PartyTab> {
         );
         created.partyId = jsonDecode(res.body)['id'] as int;
 
-        await  _getPartyList();
+        ref.invalidate(partyListProvider);
       } else{
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed: ${res.statusCode}')),
@@ -71,46 +68,12 @@ class _PartyTabState extends ConsumerState<PartyTab> {
     }
   }
 
-  Future<void> _getPartyList() async {
-    final apiClient = ref.read(apiClientProvider);
-    final res = await apiClient.get('/party/list');
-
-    if(!mounted) return;
-
-    if(res.statusCode == 200){
-      final data = jsonDecode(res.body);
-      setState(() {
-        _parties = List<Party>.from(data.where((p) => p['status'] == "OPEN").map((e) => Party.fromJson(e, _userId == e['host_id'])));
-        for(Party p in _parties){
-          final memberList = p.members.map((e) => e['user_id']).toList();
-          p.joined = memberList.contains(_userId);
-        }
-      });
-
-    } else{
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: ${res.statusCode}')),
-      );
-    }
+  Future<List<Party>> _getPartyList() async {
+    return await ref.read(partyListProvider.future);
   }
 
-  Future<void> _getUserId() async {
-    final apiClient = ref.read(apiClientProvider);
-    final res = await apiClient.get('/profile/me');
-
-    if(!mounted) return;
-
-    if(res.statusCode == 200){
-      final data = jsonDecode(res.body);
-      setState(() {
-        _userId = data['id'] as int;
-      });
-
-    } else{
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to get userId: ${res.statusCode}')),
-      );
-    }
+  Future<int> _getUserId() async {
+    return await ref.read(userIdProvider.future);
   }
 
   Future<void> _openPartyDescription(Party party) async {
@@ -122,36 +85,32 @@ class _PartyTabState extends ConsumerState<PartyTab> {
     if (!mounted) return;
 
     if (closedPartyId != null) {
-      setState(() {
-        _parties.removeWhere((p) => p.partyId == closedPartyId);
-      });
+      ref.invalidate(partyListProvider);
     }
   }
 
   @override
   void initState(){
     super.initState();
-    _getUserId();
-    _getPartyList();
 
     _sub = ref.listenManual<int>(bottomNavIndexProvider, (prev, next) {
       if (next == 0 && prev != 0) {
-        _getPartyList();
+        ref.invalidate(partyListProvider);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     ref.listen<Place?>(createPartyDialogRequestProvider, (prev, next) {
       if(next == null) return;
-      debugPrint('Listener fired event: $next');
-
       Place initialPlace = ref.read(createPartyDialogRequestProvider.notifier).state!;
       ref.read(createPartyDialogRequestProvider.notifier).state = null;
       _openCreatePartyDialog(initialPlace: initialPlace.name, initialCategory: initialPlace.categoryId);
     });
+
+    final partyAsync = ref.watch(partyListProvider);
+
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -160,20 +119,37 @@ class _PartyTabState extends ConsumerState<PartyTab> {
         child: PartyAppBar(onClick: _openCreatePartyDialog,),
       ),
 
-      body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        itemCount: _parties.length,
-        itemBuilder: (context, index) {
-          final party = _parties[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: PartyCard(
-              party: party,
-              onTap: () => _openPartyDescription(party),
-            ),
-          );
-        },
-      ),
+      body: partyAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('불러오기 실패: $e'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(partyListProvider),
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
+        ),
+      data: (parties) =>
+        ListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          itemCount: parties.length,
+          itemBuilder: (context, index) {
+            final party = parties[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 18),
+              child: PartyCard(
+                party: party,
+                onTap: () => _openPartyDescription(party),
+              ),
+            );
+          },
+        ),
+      )
     );
   }
 }

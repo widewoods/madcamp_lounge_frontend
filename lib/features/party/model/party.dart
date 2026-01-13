@@ -31,10 +31,9 @@ class Party {
   String? content;
   final bool isHost;
 
-  factory Party.fromJson(Map<String, dynamic> json, bool isHost){
+  factory Party.fromJson(Map<String, dynamic> json, int userId){
     final formattedTime = formatIsoKorean(parseIso(json['appointment_time']));
-
-    return Party(
+    final party = Party(
       partyId: json['id'] as int,
       title: json['title'].toString(),
       category: json['category'].toString(),
@@ -46,7 +45,9 @@ class Party {
       isLiked: false,
       content: json['content'].toString(),
       members: json['members'] as List<dynamic>,
-      isHost: isHost,
+      isHost: userId == json['host_id'],
     );
+    party.joined = party.members.map((e) => e['user_id']).contains(userId);
+    return party;
   }
 }

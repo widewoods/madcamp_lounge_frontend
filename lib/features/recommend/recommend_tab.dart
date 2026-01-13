@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/recommend/model/recommend_category.dart';
@@ -33,6 +35,7 @@ class RecommendTab extends ConsumerWidget {
                             ),
                         );
                       },
+                      gradientColor: generateRandomMaterialColor(),
                     );
                   },
                   childCount: recommendCategories.length,
@@ -50,4 +53,10 @@ class RecommendTab extends ConsumerWidget {
       ),
     );
   }
+}
+
+Color generateRandomMaterialColor() {
+  final Random _random = Random();
+  // Select a random color from the list of primary material colors
+  return Colors.primaries[_random.nextInt(Colors.primaries.length)];
 }

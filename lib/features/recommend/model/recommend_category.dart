@@ -24,28 +24,28 @@ final recommendCategories = <RecommendCategory>[
     id: '볼링',
     title: '볼링',
     imageUrl:
-    'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?auto=format&fit=crop&w=1200&q=80',
+    'https://unsplash.com/photos/l6DorjudX64/download?auto=format&fit=crop&w=1200&q=80',
     keyword: '볼링장',
   ),
   RecommendCategory(
     id: '게임',
     title: 'PC방',
     imageUrl:
-    'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=1200&q=80',
+    'https://unsplash.com/photos/EHLd2utEf68/download?auto=format&fit=crop&w=1200&q=80',
     keyword: 'PC방',
   ),
   RecommendCategory(
     id: '당구',
     title: '당구',
     imageUrl:
-    'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1200&q=80',
+    'https://unsplash.com/photos/DUcVepObkXk/download?auto=format&fit=crop&w=1200&q=80',
     keyword: '당구장',
   ),
   RecommendCategory(
     id: '탁구',
     title: '탁구',
     imageUrl:
-    'https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80',
+    'https://unsplash.com/photos/JwxatcF2Oec/download?auto=format&fit=crop&w=1200&q=80',
     keyword: '탁구장',
   ),
   RecommendCategory(
@@ -70,10 +70,38 @@ final recommendCategories = <RecommendCategory>[
     keyword: '헬스장',
   ),
   RecommendCategory(
-    id: '노래방 가기',
+    id: '노래',
     title: '노래방',
     imageUrl:
-    'https://unsplash.com/photos/Gi6-m_t_W-E/download?force=true&w=1920',
+    'https://unsplash.com/photos/Gi6-m_t_W-E/download?auto=format&fit=crop&w=1200&q=80',
     keyword: '노래방',
+  ),
+  RecommendCategory(
+    id: '오락실',
+    title: '오락실',
+    imageUrl:
+    'https://unsplash.com/photos/8Gdayy2Lhi0/download?auto=format&fit=crop&w=1200&q=80',
+    keyword: '오락실',
+  ),
+  RecommendCategory(
+    id: '만화카페',
+    title: '만화카페',
+    imageUrl:
+    'https://unsplash.com/photos/d2Py_uhXJQo/download?auto=format&fit=crop&w=1200&q=80',
+    keyword: '만화카페',
+  ),
+  RecommendCategory(
+    id: '배드민턴',
+    title: '배드민턴',
+    imageUrl:
+    'https://unsplash.com/photos/U5epRU6sY_A/download?auto=format&fit=crop&w=1200&q=80',
+    keyword: '배드민턴장',
+  ),
+  RecommendCategory(
+    id: '클라이밍',
+    title: '클라이밍',
+    imageUrl:
+    'https://unsplash.com/photos/NY1D4Zni7fc/download?auto=format&fit=crop&w=1200&q=80',
+    keyword: '클라이밍장',
   ),
 ];

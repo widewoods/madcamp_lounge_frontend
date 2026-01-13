@@ -62,12 +62,14 @@ class ApiClient {
   Future<http.Response> delete(
     String path, {
     Map<String, String>? headers,
+    Map<String, String>? body,
     bool useAuth = true,
   }) async {
     return _send(
       'DELETE',
       path,
       headers: headers,
+      body: body,
       useAuth: useAuth,
     );
   }
