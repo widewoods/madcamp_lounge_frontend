@@ -159,7 +159,12 @@ class _LoginPage extends ConsumerState<LoginPage> {
 
       if (!mounted) return;
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
+      if(data['loginId'] == pw){
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage(startIndex: 3,)));
+      }
+      else{
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
+      }
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(
