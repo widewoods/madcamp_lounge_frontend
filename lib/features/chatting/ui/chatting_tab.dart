@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_room.dart';
 import 'package:madcamp_lounge/features/chatting/state/chatting_state.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chat_room_page.dart';
+import 'package:madcamp_lounge/state/auth_state.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 
 class ChattingTab extends ConsumerStatefulWidget {
   const ChattingTab({super.key});
@@ -13,6 +15,7 @@ class ChattingTab extends ConsumerStatefulWidget {
 
 class _ChattingTabState extends ConsumerState<ChattingTab> {
   ProviderSubscription<int>? _refreshSub;
+  StompClient? _stompClient;
 
   @override
   void initState() {
@@ -28,12 +31,44 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
       if (!mounted) return;
       ref.refresh(chatRoomListProvider);
     });
+    _connectStomp();
   }
 
   @override
   void dispose() {
     _refreshSub?.close();
+    _stompClient?.deactivate();
     super.dispose();
+  }
+
+  void _connectStomp() {
+    final accessToken = ref.read(accessTokenProvider);
+    if (accessToken == null || accessToken.isEmpty) {
+      return;
+    }
+
+    const wsUrl = 'ws://34.50.62.91:8080/ws';
+    _stompClient = StompClient(
+      config: StompConfig(
+        url: wsUrl,
+        onConnect: (_) {
+          _stompClient?.subscribe(
+            destination: '/topic/rooms',
+            callback: (_) {
+              if (!mounted) return;
+              ref.refresh(chatRoomListProvider);
+            },
+          );
+        },
+        stompConnectHeaders: {
+          'Authorization': 'Bearer $accessToken',
+        },
+        webSocketConnectHeaders: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      ),
+    );
+    _stompClient?.activate();
   }
 
   String _formatDate(DateTime? value) {
@@ -77,9 +112,11 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
   Widget _buildRoomTile(BuildContext context, ChatRoom room) {
     final title = (room.partyTitle != null && room.partyTitle!.isNotEmpty)
         ? room.partyTitle!
-        : (room.partyId == null
-            ? '채팅방 #${room.roomId}'
-            : '파티 #${room.partyId}');
+        : (room.otherName != null && room.otherName!.isNotEmpty)
+            ? room.otherName!
+            : (room.partyId == null
+                ? '채팅방 #${room.roomId}'
+                : '파티 #${room.partyId}');
     final lastMessageAt = _formatDate(room.lastMessageAt);
     final lastMessageContent = (room.lastMessageContent ?? '').trim();
     final hasLastMessage = lastMessageContent.isNotEmpty || lastMessageAt.isNotEmpty;
