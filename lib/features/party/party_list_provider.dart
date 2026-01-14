@@ -17,7 +17,6 @@ final partyListProvider = FutureProvider<List<Party>>((ref) async {
     return List<Party>.from(data.where((p) => p['status'] == "OPEN").map((e) => Party.fromJson(e, userId)));
   } else{
     throw Exception("Failed to get partyList: ${res.statusCode}");
-    return <Party>[];
   }
 });
 

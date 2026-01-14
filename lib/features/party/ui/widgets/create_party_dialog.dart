@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:madcamp_lounge/features/party/date_formatting.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
+import 'package:madcamp_lounge/features/party/ui/widgets/pick_category_sheet.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/pick_date_sheet.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/pick_time_sheet.dart';
+import 'package:madcamp_lounge/gradient_button.dart';
 import 'package:madcamp_lounge/theme.dart';
 
 class CreatePartyDialog extends StatefulWidget {
@@ -153,6 +155,14 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                   controller: _categoryCtrl,
                   decoration: inputDecorationWithHint("예: 보드게임"),
                   textInputAction: TextInputAction.next,
+                  readOnly: true,
+                  onTap: () async {
+                    final picked = await showPickCategorySheet(context);
+                    if (picked == null) return;
+                    setState(() {
+                      _categoryCtrl.text = picked.title;
+                    });
+                  }
                 ),
 
                 const SizedBox(height: _formPadding),
@@ -193,21 +203,21 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("취소"),
-                      ),
+                      child: GradientButton(
+                          text: "취소",
+                          onPressed: () => Navigator.pop(context),
+                          colors: [
+                            Colors.red,
+                            Colors.redAccent
+                          ]
+                      )
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: ElevatedButton(
+                      child: GradientButton(
                         onPressed: disabled ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          )
-                        ),
-                        child: const Text("만들기"),
+                        text: "만들기",
+                        colors: gradientColor,
                       ),
                     ),
                   ],
@@ -222,8 +232,6 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
   void _submit() {
     final title = _titleCtrl.text.trim();
     final category = _categoryCtrl.text.trim();
-    final date = _dateCtrl.text.trim();
-    final time = _timeCtrl.text.trim();
     final location = _locationCtrl.text.trim();
     final content = _contentCtrl.text.trim();
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/party/party_list_provider.dart';
+import 'package:madcamp_lounge/gradient_button.dart';
+import 'package:madcamp_lounge/theme.dart';
 
 import '../../../../pages/main_page.dart';
 import '../../model/party.dart';
@@ -33,9 +35,9 @@ class _PartyCardState extends State<PartyCard> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Color(0x14000000).withValues(alpha: 0.04),
-              blurRadius: 20,
-              offset: Offset(0, 10),
+              color: Color(0x14000000).withValues(alpha: 0.1),
+              blurRadius: 4,
+              offset: Offset(0, 3),
             ),
           ],
         ),
@@ -89,12 +91,25 @@ class _PartyCardState extends State<PartyCard> {
                         const SizedBox(height: 2),
 
                         // 카테고리
-                        Text(
-                          widget.party.category,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: primary,
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              gradient: RadialGradient(
+                                center: AlignmentGeometry.topLeft,
+                                radius: 1.1,
+                                colors: gradientColor,
+                              )
+                            ),
+                            child: Text(
+                              widget.party.category,
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -175,15 +190,10 @@ class _JoinButtonState extends ConsumerState<JoinButton> {
     return SizedBox(
       height: 48,
       width: double.infinity,
-      child: ElevatedButton(
+      child: GradientButton(
         onPressed: disabled ? null : _onJoin,
-        style: ElevatedButton.styleFrom(
-          textStyle: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          )
-        ),
-        child: const Text("참가하기"),
+        text: "참가하기",
+        colors: gradientColor
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/recommend/place_map_page.dart';
+import 'package:madcamp_lounge/theme.dart';
+import '../../../../gradient_button.dart';
 import '../../../party/party_dialog_request_provider.dart';
 import '../../model/place.dart';
 
@@ -60,13 +62,13 @@ class PlaceCard extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.near_me_outlined, size: 13, color: Theme.of(context).primaryColor,),
+                            Icon(Icons.near_me_outlined, size: 14, color: Theme.of(context).primaryColor,),
                             const SizedBox(width: 3),
                             Text(
                               "${place.distanceKm}km",
                               style: TextStyle(
                                 color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w900,
                                 fontSize: 11
                               ),
                             ),
@@ -100,14 +102,13 @@ class PlaceCard extends ConsumerWidget {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: ElevatedButton(
+                      child: GradientButton(
                         onPressed: () {
                           ref.read(createPartyDialogRequestProvider.notifier).state = place;
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4)
-                        ),
-                        child: Text("파티 생성"),
+                        text: "파티 생성",
+                        colors: gradientColor,
+                        height: 40,
                       ),
                     )
                   ],

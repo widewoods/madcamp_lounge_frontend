@@ -21,6 +21,9 @@ class FixedField extends StatelessWidget {
         letterSpacing: -0.2,
         color: Color(0xFF111827),
       ),
+      decoration: InputDecoration(
+        filled: false
+      ),
     );
   }
 }

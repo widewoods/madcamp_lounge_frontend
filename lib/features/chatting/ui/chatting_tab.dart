@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_room.dart';
 import 'package:madcamp_lounge/features/chatting/state/chatting_state.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chat_room_page.dart';
-import 'package:madcamp_lounge/state/auth_state.dart';
-import 'package:stomp_dart_client/stomp_dart_client.dart';
+import 'package:madcamp_lounge/theme.dart';
 
 class ChattingTab extends ConsumerStatefulWidget {
   const ChattingTab({super.key});
@@ -74,16 +73,16 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
   String _formatDate(DateTime? value) {
     if (value == null) return '';
     return '${value.month.toString().padLeft(2, '0')}.'
-        '${value.day.toString().padLeft(2, '0')} '
+        '${(value.day).toString().padLeft(2, '0')} '
         '${value.hour.toString().padLeft(2, '0')}:'
         '${value.minute.toString().padLeft(2, '0')}';
   }
 
   Widget _buildUnreadBadge(int count) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: const Color(0xFF4C46E5),
+        color: kPrimary,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
@@ -128,27 +127,36 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x12000000),
-              blurRadius: 12,
-              offset: Offset(0, 6),
-            ),
-          ],
+          // borderRadius: BorderRadius.circular(14),
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Color(0x14000000).withValues(alpha: 0.1),
+          //     blurRadius: 4,
+          //     offset: Offset(0, 3),
+          //   ),
+          // ],
         ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 54,
+              height: 54,
               decoration: BoxDecoration(
-                color: const Color(0xFFE6ECFF),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
+                gradient: RadialGradient(
+                  center: Alignment.topLeft,
+                  colors: [
+                    kPrimary.withValues(alpha: 0.5),
+                    kPrimary.withValues(alpha: 0.8),
+                  ],
+                  radius: 1.1
+
+                )
               ),
+              padding: EdgeInsets.only(top: 2.0),
               child: const Icon(
                 Icons.chat_bubble_outline_rounded,
-                color: Color(0xFF4C46E5),
+                color: Colors.white,
               ),
             ),
             const SizedBox(width: 14),
@@ -156,48 +164,64 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF111827),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        lastMessageAt,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+
                   ),
                   const SizedBox(height: 4),
-                  if (!hasLastMessage)
-                    const Text(
-                      '최근 메시지 없음',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF6B7280),
-                      ),
-                    )
-                  else ...[
-                    Text(
-                      lastMessageContent.isEmpty ? '메시지 없음' : lastMessageContent,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF6B7280),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      lastMessageAt,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
-                      ),
-                    ),
-                  ],
+                  Row(
+                    children: [
+                      if (!hasLastMessage)
+                        Expanded(
+                          child: const Text(
+                            '최근 메시지 없음',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        )
+                      else ...[
+                        Expanded(
+                          child: Text(
+                            lastMessageContent.isEmpty ? '메시지 없음' : lastMessageContent,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                      ],
+                      if (room.unreadCount > 0) _buildUnreadBadge(room.unreadCount),
+                    ],
+                  )
+
                 ],
               ),
             ),
-            if (room.unreadCount > 0) _buildUnreadBadge(room.unreadCount),
           ],
         ),
       ),
@@ -244,7 +268,7 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                     itemCount: list.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => const SizedBox(height: 0),
                     itemBuilder: (context, index) =>
                         _buildRoomTile(context, list[index]),
                   ),

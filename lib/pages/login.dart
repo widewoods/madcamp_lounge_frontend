@@ -29,108 +29,100 @@ class _LoginPage extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF4C46E5);
+    const primary = kPrimary;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topRight,
-            radius: 1.2,
-            colors: [Color(0xFFE8F0FF), Color(0xFFF4F7FF)],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final maxW = constraints.maxWidth;
-                final cardWidth = maxW < 560 ? maxW * 0.9 : 520.0;
+      backgroundColor: scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final maxW = constraints.maxWidth;
+              final cardWidth = maxW < 560 ? maxW * 0.9 : 520.0;
 
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 28),
-                  child: Container(
-                    width: cardWidth,
-                    padding: const EdgeInsets.fromLTRB(28, 28, 28, 22),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(26),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x1A000000),
-                          blurRadius: 28,
-                          offset: Offset(0, 14),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        LoginIcon(primary: primary),
-                        const SizedBox(height: 16),
-
-                        TitleText(),
-                        const SizedBox(height: 8),
-
-                        SubtitleText(),
-                        const SizedBox(height: 26),
-
-                        //Id field
-                        const Text(
-                          "아이디",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _idCtrl,
-                          textInputAction: TextInputAction.next,
-                          enableInteractiveSelection: false,
-                          decoration: inputDecorationWithHint("아이디를 입력하세요"),
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Password field
-                        const Text(
-                          "비밀번호",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _pwCtrl,
-                          obscureText: true,
-                          textInputAction: TextInputAction.done,
-                          decoration: inputDecorationWithHint("비밀번호를 입력하세요"),
-                          onSubmitted: (_) => _login(context),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Login button
-                        SizedBox(
-                          height: 56,
-                          child: FilledButton(
-                            style:Theme.of(context).filledButtonTheme.style,
-                            onPressed: () => _login(context),
-                            child: const Text("로그인"),
-                          ),
-                        ),
-
-                        const SizedBox(height: 18),
-                        FirstLoginText(),
-                      ],
-                    ),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 28),
+                child: Container(
+                  width: cardWidth,
+                  padding: const EdgeInsets.fromLTRB(28, 28, 28, 22),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(26),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1A000000),
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      LoginIcon(primary: primary),
+                      const SizedBox(height: 16),
+
+                      TitleText(),
+                      const SizedBox(height: 8),
+
+                      SubtitleText(),
+                      const SizedBox(height: 26),
+
+                      //Id field
+                      const Text(
+                        "아이디",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _idCtrl,
+                        textInputAction: TextInputAction.next,
+                        enableInteractiveSelection: false,
+                        decoration: inputDecorationWithHint("아이디를 입력하세요"),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Password field
+                      const Text(
+                        "비밀번호",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _pwCtrl,
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        decoration: inputDecorationWithHint("비밀번호를 입력하세요"),
+                        onSubmitted: (_) => _login(context),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Login button
+                      SizedBox(
+                        height: 56,
+                        child: FilledButton(
+                          style:Theme.of(context).filledButtonTheme.style,
+                          onPressed: () => _login(context),
+                          child: const Text("로그인"),
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+                      FirstLoginText(),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

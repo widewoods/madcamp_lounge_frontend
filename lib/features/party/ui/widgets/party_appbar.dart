@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:madcamp_lounge/gradient_button.dart';
+import 'package:madcamp_lounge/theme.dart';
 
 class PartyAppBar extends StatelessWidget {
   const PartyAppBar({
@@ -15,11 +17,14 @@ class PartyAppBar extends StatelessWidget {
         "파티원 구하기",
         textAlign: TextAlign.left,
       ),
+      actionsPadding: EdgeInsets.only(right: 10.0),
       actions: [
-        ElevatedButton.icon(
+        GradientButton(
           onPressed: onClick,
-          icon: Icon(Icons.add),
-          label: const Text("파티 만들기"),
+          height: 45,
+          icon: Icon(Icons.add, color: Colors.white,),
+          colors: gradientColor,
+          text: "파티 만들기",
         )
       ],
     );

@@ -58,11 +58,11 @@ class _MainPageState extends ConsumerState<MainPage> {
         child: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-                icon: Icon(Icons.people_outline),
+                icon: Icon(Icons.people),
                 label: "파티 모집"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.map_outlined),
+                icon: Icon(Icons.location_pin),
                 label: "놀거리 추천"
             ),
             BottomNavigationBarItem(
@@ -70,7 +70,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                 label: "채팅"
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
+                icon: Icon(Icons.person),
                 label: "프로필"
             ),
           ],
@@ -79,7 +79,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             fontWeight: FontWeight.w500,
           ),
           selectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
           currentIndex: _selectedIndex,
           onTap: _onIconTapped,
