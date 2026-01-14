@@ -159,10 +159,16 @@ class _LoginPage extends ConsumerState<LoginPage> {
 
       if (!mounted) return;
       // ignore: use_build_context_synchronously
-      if(data['loginId'] == pw){
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage(startIndex: 3,)));
-      }
-      else{
+      if (data['loginId'] == pw) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => MainPage(
+              startIndex: 3,
+              showPasswordChangeDialog: true,
+            ),
+          ),
+        );
+      } else {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainPage()));
       }
     } else {

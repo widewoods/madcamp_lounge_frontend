@@ -13,9 +13,11 @@ class MainPage extends ConsumerStatefulWidget {
   const MainPage({
     super.key,
     this.startIndex,
+    this.showPasswordChangeDialog = false,
   });
 
   final int? startIndex;
+  final bool showPasswordChangeDialog;
 
   @override
   ConsumerState<MainPage> createState() => _MainPageState();
@@ -48,6 +50,29 @@ class _MainPageState extends ConsumerState<MainPage> {
       ref.read(allPlacesProvider.future);
       }
     );
+    if (widget.showPasswordChangeDialog) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('비밀번호 변경 권장'),
+              content: const Text(
+                '현재 비밀번호가 초기 비밀번호입니다.\n보안을 위해 비밀번호를 변경해주세요.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('확인'),
+                ),
+              ],
+            );
+          },
+        );
+      });
+    }
   }
 
   @override
