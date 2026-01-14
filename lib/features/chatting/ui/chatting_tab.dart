@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_room.dart';
 import 'package:madcamp_lounge/features/chatting/state/chatting_state.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chat_room_page.dart';
+import 'package:madcamp_lounge/state/auth_state.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:madcamp_lounge/theme.dart';
 
 class ChattingTab extends ConsumerStatefulWidget {
@@ -46,7 +48,7 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
       return;
     }
 
-    const wsUrl = 'ws://34.50.62.91:8080/ws';
+    const wsUrl = 'ws://10.0.2.2:8080/ws';
     _stompClient = StompClient(
       config: StompConfig(
         url: wsUrl,
