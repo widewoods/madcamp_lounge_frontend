@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
-const kPrimary = Color(0xFF4C46E5);
-const inputBorderColor = Color(0xFFD6D9E6);
-const scaffoldBackgroundColor = Color(0xFFF6F6F6);
-final kSecondary = kPrimary.withValues(alpha: 0.3);
+const kPrimary = Color(0xFF10B981);
+const inputBorderColor = Color(0xFFE6EDE9);
+const scaffoldBackgroundColor = Color(0xFFF7FDFB);
+const kSecondary = Color(0xFF47A4EF);
+final kPrimaryBackground = kPrimary.withValues(alpha: 0.15);
+final gradientColor = <Color>[ Color(0xFF22C55E),Color(0xFF10B99A),];
 
 ThemeData buildTheme() {
   final base = ThemeData(
     useMaterial3: true,
     primaryColor: kPrimary,
-    fontFamilyFallback: const ["Apple SD Gothic Neo", "Noto Sans KR", "Roboto"],
+    fontFamily: 'Pretendard',
+    fontFamilyFallback: const ["Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Roboto"],
   );
 
   final commonShape = RoundedRectangleBorder(
@@ -48,7 +51,7 @@ ThemeData buildTheme() {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12),
         side: BorderSide(color: inputBorderColor, width: 1.6),
@@ -62,18 +65,18 @@ ThemeData buildTheme() {
 
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
-      fillColor: Colors.white,
+      fillColor: const Color(0xFFFEFFFE),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: inputBorderColor, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: kPrimary, width: 2.3),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: kPrimary, width: 1.3),
       ),
       disabledBorder: UnderlineInputBorder(
-        borderSide: const BorderSide(color: Color(0xFFE8E8E8), width: 1.0),
+        borderSide: const BorderSide(color: inputBorderColor, width: 1.0),
       ),
     ),
 
@@ -102,7 +105,7 @@ ThemeData buildTheme() {
 InputDecoration inputDecorationWithHint(String hint) {
   return InputDecoration(
     hintText: hint,
-    hintStyle: const TextStyle(color: Color(0xFF9AA0AE)),
+    hintStyle: const TextStyle(color: Color(0xFF829180)),
   );
 }
 
@@ -110,8 +113,8 @@ InputDecoration inputDecorationWithHint(String hint) {
 InputDecoration inputDecorationWithHintIcon(String hint, Icon icon) {
   return InputDecoration(
     hintText: hint,
-    hintStyle: const TextStyle(color: Color(0xFF9AA0AE)),
+    hintStyle: const TextStyle(color: Color(0xFF829180)),
     suffixIcon: icon,
-    suffixIconColor: Color(0xFF9AA0AE),
+    suffixIconColor: Color(0xFF829180),
   );
 }

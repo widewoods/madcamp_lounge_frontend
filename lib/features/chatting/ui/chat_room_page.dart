@@ -9,6 +9,7 @@ import 'package:madcamp_lounge/features/chatting/model/chat_member.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_room_detail.dart';
 import 'package:madcamp_lounge/features/chatting/state/chat_room_detail_state.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
+import 'package:madcamp_lounge/theme.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
 class ChatRoomPage extends ConsumerStatefulWidget {
@@ -30,7 +31,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   StompClient? _stompClient;
   bool _stompConnected = false;
   bool _didInitialScroll = false;
-  bool _allowLoadMore = false;
   bool _loadingMoreRequest = false;
   DateTime? _lastLoadMoreAt;
   int? _userId;
@@ -198,7 +198,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         return;
       }
       _scrollController.jumpTo(minExtent);
-      _allowLoadMore = true;
     });
   }
 
@@ -221,7 +220,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         curve: Curves.easeOut,
         alignment: 0.2,
       );
-      _allowLoadMore = true;
     });
   }
 
@@ -239,7 +237,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         curve: Curves.easeOut,
         alignment: 0.2,
       );
-      _allowLoadMore = true;
     });
   }
 
@@ -289,14 +286,22 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                                   Container(
                                     width: 36,
                                     height: 36,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFE6ECFF),
+                                    decoration:  BoxDecoration(
+                                      color: kPrimary.withValues(alpha: 0.15),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(
-                                      Icons.person_outline_rounded,
-                                      color: Color(0xFF4C46E5),
-                                      size: 20,
+                                    child: Align(
+                                      alignment: AlignmentGeometry.center,
+                                      child: Center(
+                                        child: Text(
+                                          member.name[0],
+                                          style: TextStyle(
+                                              color: Theme.of(context).primaryColor,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -394,7 +399,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                 );
               }
               final nickname = data['nickname']?.toString() ?? '';
-              final classSection = data['class_section']?.toString() ?? '';
+              final classSection = data['classSection']?.toString() ?? '';
               final mbti = data['mbti']?.toString() ?? '';
               final hobby = data['hobby']?.toString() ?? '';
               final introduction = data['introduction']?.toString() ?? '';
@@ -410,13 +415,19 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                         Container(
                           width: 44,
                           height: 44,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFE6ECFF),
+                          decoration: BoxDecoration(
+                            color: kPrimary.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.person_outline_rounded,
-                            color: Color(0xFF4C46E5),
+                          child: Center(
+                            child: Text(
+                              nickname[0],
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -479,8 +490,8 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   Widget _buildBubble(ChatMessage message, {String? senderName}) {
     final isMine = _userId != null && message.senderId == _userId;
-    final bubbleColor = isMine ? _primary : const Color(0xFFF0F2F8);
-    final textColor = isMine ? Colors.white : const Color(0xFF111827);
+    final bubbleColor = isMine ? _primary : Color(0xFFF0F4F2);
+    final textColor = isMine ? Colors.white : const Color(0xFF1F2937);
 
     String _formatTime(DateTime value) {
       return '${value.hour.toString().padLeft(2, '0')}:'
@@ -493,6 +504,14 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       decoration: BoxDecoration(
         color: bubbleColor,
         borderRadius: BorderRadius.circular(16),
+        gradient: isMine ? LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF34D399), // 밝은 민트
+            Color(0xFF10B981), // 메인 에메랄드
+          ]
+        ) : null
       ),
       child: Text(
         message.content,
@@ -532,20 +551,26 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
+            splashColor: Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             onTap: () => _showProfileSheet(message.senderId),
             child: Container(
               width: 32,
               height: 32,
               margin: const EdgeInsets.only(right: 8, top: 6),
-              decoration: const BoxDecoration(
-                color: Color(0xFFE6ECFF),
+              decoration:  BoxDecoration(
+                color: kPrimary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.person_outline_rounded,
-                size: 18,
-                color: Color(0xFF4C46E5),
+              child: Center(
+                child: Text(
+                    senderName![0],
+                    style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
               ),
             ),
           ),
@@ -624,7 +649,9 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           };
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF6FBF9),
       appBar: AppBar(
+        backgroundColor: const Color(0xFFF6FBF9),
         title: Row(
           children: [
             Expanded(
@@ -658,8 +685,9 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                 ],
               ),
             ),
-          ],
+          ]
         ),
+        scrolledUnderElevation: 0,
       ),
       body: SafeArea(
         child: Column(
@@ -704,26 +732,14 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                       controller: _inputController,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _sendMessage(),
-                      decoration: InputDecoration(
-                        hintText: '메시지 입력',
-                        filled: true,
-                        fillColor: const Color(0xFFF4F5FA),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                      ),
+                      decoration: inputDecorationWithHint("메시지 입력")
                     ),
                   ),
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: _sendMessage,
                     style: FilledButton.styleFrom(
-                      backgroundColor: _primary,
+                      backgroundColor: kPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),

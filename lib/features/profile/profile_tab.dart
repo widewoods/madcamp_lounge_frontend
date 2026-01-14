@@ -8,10 +8,10 @@ import 'package:madcamp_lounge/features/profile/ui/widgets/change_password_dialo
 import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
+import 'package:madcamp_lounge/gradient_button.dart';
 import 'package:madcamp_lounge/pages/login.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
-
-import '../../theme.dart';
+import 'package:madcamp_lounge/theme.dart';
 
 class ProfileTab extends ConsumerStatefulWidget {
   const ProfileTab({super.key});
@@ -196,13 +196,20 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                           width: 86,
                           height: 86,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE6ECFF),
+                            color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.person_outline_rounded,
-                            size: 50,
-                            color: kPrimary,
+                          padding: EdgeInsetsDirectional.only(bottom: 0.0),
+                          child: Align(
+                            alignment: AlignmentGeometry.center,
+                            child: Text(
+                              _nameCtrl.text.isEmpty ? '' : _nameCtrl.text[0],
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 43,
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 14),
@@ -300,26 +307,16 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                         ),
                         SizedBox(width: 10,),
                         Expanded(
-                          child: ElevatedButton.icon(
+                          child: GradientButton(
                             onPressed: () async {
                               setState(() => _isEditing = !_isEditing);
                               if (!_isEditing) {
                                 await _saveProfile();
                               }
                             },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 12,
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.2,
-                              ),
-                            ),
-                            icon: const Icon(Icons.edit, size: 18),
-                            label: Text(_isEditing ? "저장" : "수정"),
+                            icon: const Icon(Icons.edit, size: 18, color: Colors.white,),
+                            text: _isEditing ? "저장" : "수정",
+                            colors: gradientColor,
                           ),
                         ),
                       ],

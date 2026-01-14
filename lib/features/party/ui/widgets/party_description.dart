@@ -93,7 +93,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                   }, icon: Icon(Icons.close))
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 2),
 
               Align(
                 alignment: Alignment.centerLeft,
@@ -108,29 +108,19 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                   ),
                   child: Text(
                     widget.party.category,
-                    style: TextStyle(color: kPrimary),
+                    style: TextStyle(color: kPrimary, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
 
               if (widget.party.content != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: infoBackgroundColor,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded, color: Colors.black),
-                      const SizedBox(width: 5),
-                      Text(widget.party.content!),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.info_outline_rounded, color: Color(0xFF757575), size: 18,),
+                    const SizedBox(width: 5),
+                    Text(widget.party.content!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
+                  ],
                 ),
 
               const SizedBox(height: 10),
