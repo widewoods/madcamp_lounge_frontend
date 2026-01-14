@@ -5,7 +5,7 @@ const inputBorderColor = Color(0xFFE6EDE9);
 const scaffoldBackgroundColor = Color(0xFFF7FDFB);
 const kSecondary = Color(0xFF47A4EF);
 final kPrimaryBackground = kPrimary.withValues(alpha: 0.15);
-final gradientColor = <Color>[ Color(0xFF22C55E),Color(0xFF10B99A),];
+final gradientColor = <Color>[ Color(0xFF22C55E),Color(0xFF13E4C0),];
 
 ThemeData buildTheme() {
   final base = ThemeData(
