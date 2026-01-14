@@ -52,8 +52,8 @@ class _PartyCardState extends State<PartyCard> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: SizedBox(
-                      width: 92,
-                      height: 92,
+                      width: 110,
+                      height: 110,
                       child: Image.network(
                         widget.party.imageUrl,
                         fit: BoxFit.cover,
@@ -71,7 +71,6 @@ class _PartyCardState extends State<PartyCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 제목 + 하트
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -95,7 +94,7 @@ class _PartyCardState extends State<PartyCard> {
                           alignment: Alignment.centerLeft,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
+                              horizontal: 10,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
@@ -112,7 +111,7 @@ class _PartyCardState extends State<PartyCard> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
 
                         _InfoRow(icon: Icons.access_time, text: widget.party.time),
                         const SizedBox(height: 6),

@@ -4,6 +4,7 @@ import 'package:madcamp_lounge/features/party/model/party.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/pick_category_sheet.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/pick_date_sheet.dart';
 import 'package:madcamp_lounge/features/party/ui/widgets/pick_time_sheet.dart';
+import 'package:madcamp_lounge/features/recommend/model/recommend_category.dart';
 import 'package:madcamp_lounge/gradient_button.dart';
 import 'package:madcamp_lounge/theme.dart';
 
@@ -106,7 +107,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                     controller: _dateCtrl,
-                    decoration: inputDecorationWithHintIcon("날짜를 선택 하세요", Icon(Icons.calendar_today_outlined)),
+                    decoration: inputDecorationWithHintIcon("날짜를 선택하세요", Icon(Icons.calendar_today_outlined)),
                     textInputAction: TextInputAction.next,
                     readOnly: true,
                     onTap: () async {
@@ -153,14 +154,14 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _categoryCtrl,
-                  decoration: inputDecorationWithHint("예: 보드게임"),
+                  decoration: inputDecorationWithHintIcon("카테고리를 선택하세요", Icon(Icons.category_outlined)),
                   textInputAction: TextInputAction.next,
                   readOnly: true,
                   onTap: () async {
-                    final picked = await showPickCategorySheet(context);
+                    final picked = await showPickCategorySheet(context,);
                     if (picked == null) return;
                     setState(() {
-                      _categoryCtrl.text = picked.title;
+                      _categoryCtrl.text = picked;
                     });
                   }
                 ),

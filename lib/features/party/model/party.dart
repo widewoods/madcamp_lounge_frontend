@@ -1,3 +1,5 @@
+import 'package:madcamp_lounge/features/recommend/model/recommend_category.dart';
+
 import '../date_formatting.dart';
 
 class Party {
@@ -30,9 +32,12 @@ class Party {
   bool joined;
   String? content;
   final bool isHost;
+  final String defaultImage = "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80";
+
 
   factory Party.fromJson(Map<String, dynamic> json, int userId){
     final formattedTime = formatIsoKorean(parseIso(json['appointment_time']));
+    final category = recommendCategories.where((e) => e.title == json['category'].toString()).toList();
     final party = Party(
       partyId: json['id'] as int,
       title: json['title'].toString(),
@@ -41,7 +46,8 @@ class Party {
       locationText: json['place_name'].toString(),
       currentCount: json['current_capacity'] as int,
       targetCount: json['target_count'] as int,
-      imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
+      imageUrl: category.isNotEmpty ? category[0].imageUrl
+          : "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80",
       isLiked: false,
       content: json['content'].toString(),
       members: json['members'] as List<dynamic>,

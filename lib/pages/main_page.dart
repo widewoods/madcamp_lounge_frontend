@@ -10,7 +10,12 @@ import 'package:madcamp_lounge/features/recommend/state/recommend_providers.dart
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 
 class MainPage extends ConsumerStatefulWidget {
-  const MainPage({super.key});
+  const MainPage({
+    super.key,
+    this.startIndex,
+  });
+
+  final int? startIndex;
 
   @override
   ConsumerState<MainPage> createState() => _MainPageState();
@@ -38,6 +43,7 @@ class _MainPageState extends ConsumerState<MainPage> {
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.startIndex ?? 0;
     Future.microtask(() {
       ref.read(allPlacesProvider.future);
       }

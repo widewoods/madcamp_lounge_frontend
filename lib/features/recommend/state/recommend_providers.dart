@@ -23,7 +23,7 @@ final allPlacesProvider = FutureProvider<Map<String, List<Place>>>((ref) async {
     final results = await RecommendSearchService.searchNearby(
       pos: pos,
       categoryKeyword: category.keyword,
-      radiusKm: 4,
+      radiusKm: 3,
     );
 
     final places = results
