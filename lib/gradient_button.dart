@@ -33,7 +33,7 @@ class GradientButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: AlignmentGeometry.topLeft,
-            radius: 4.0,
+            radius: 3.0,
             colors: isEnabled
                 ? colors
                 : [Colors.grey.shade300, Colors.grey.shade300],

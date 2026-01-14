@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:madcamp_lounge/api_client.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/change_password_dialog.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/editable_field.dart';
+import 'package:madcamp_lounge/features/profile/ui/widgets/expandable_bio.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/fixed_field.dart';
 import 'package:madcamp_lounge/features/profile/ui/widgets/profile_appbar.dart';
 import 'package:madcamp_lounge/gradient_button.dart';
@@ -236,14 +237,15 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                                 ),
                               ),
                               SizedBox(height: 4),
-                              Text(
-                                _introductionCtrl.text,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF3E3E3E),
-                                ),
-                              ),
+                              ExpandableBio(bio: _introductionCtrl.text),
+                              // Text(
+                              //   _introductionCtrl.text,
+                              //   style: TextStyle(
+                              //     fontSize: 14,
+                              //     fontWeight: FontWeight.w700,
+                              //     color: Color(0xFF575757),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),

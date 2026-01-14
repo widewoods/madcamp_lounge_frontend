@@ -52,7 +52,7 @@ class ChatRoomDetail {
     final createdAtRaw = room['created_at']?.toString();
     DateTime? createdAt;
     if (createdAtRaw != null && createdAtRaw.isNotEmpty) {
-      createdAt = DateTime.tryParse(createdAtRaw);
+      createdAt = DateTime.parse(createdAtRaw).add(Duration(hours: 9));
     }
 
     final members = (json['members'] as List<dynamic>)
