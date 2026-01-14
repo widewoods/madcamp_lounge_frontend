@@ -48,7 +48,7 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
       return;
     }
 
-    const wsUrl = 'ws://10.0.2.2:8080/ws';
+    const wsUrl = 'ws://34.50.62.91:8080/ws';
     _stompClient = StompClient(
       config: StompConfig(
         url: wsUrl,
