@@ -19,13 +19,14 @@ class RecommendListPage extends ConsumerWidget {
         centerTitle: true,
       ),
       body: asyncPlaces.when(
-        data: (places) => ListView.separated(
+        data: (places) => places[category.id]!.isNotEmpty ? ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           itemCount: places[category.id]!.length,
           separatorBuilder: (_, __) => const SizedBox(height: 12),
           itemBuilder: (_, i) => PlaceCard(
             place: places[category.id]![i],
           ),
+          ) : Center(child: Text("근처에 검색된 장소가 없습니다."),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(

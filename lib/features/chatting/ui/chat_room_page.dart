@@ -426,6 +426,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                   ),
                 );
               }
+              final name = data['name']?.toString() ?? '';
               final nickname = data['nickname']?.toString() ?? '';
               final classSection = data['classSection']?.toString() ?? '';
               final mbti = data['mbti']?.toString() ?? '';
@@ -449,7 +450,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                           ),
                           child: Center(
                             child: Text(
-                              nickname[0],
+                              name[0],
                               style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 22,
@@ -474,8 +475,8 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                             _startDirectChat(userId);
                           },
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF4C46E5)),
-                            foregroundColor: const Color(0xFF4C46E5),
+                            side: const BorderSide(color: kPrimary, width: 1.2),
+                            foregroundColor: kPrimary,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
                               vertical: 8,
@@ -535,7 +536,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     );
   }
 
-  Widget _buildBubble(ChatMessage message, {String? senderName}) {
+  Widget _buildBubble(ChatMessage message, double maxWidth, {String? senderName}) {
     final isMine = _userId != null && message.senderId == _userId;
     final bubbleColor = isMine ? _primary : Color(0xFFF0F4F2);
     final textColor = isMine ? Colors.white : const Color(0xFF1F2937);
@@ -544,30 +545,33 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       return '${value.hour.toString().padLeft(2, '0')}:'
           '${value.minute.toString().padLeft(2, '0')}';
     }
-
+    
     final unreadLabel = message.unreadCount > 0 ? '${message.unreadCount}' : '';
 
-    final bubble = Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: bubbleColor,
-        borderRadius: BorderRadius.circular(16),
-        gradient: isMine ? LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF34D399), // 밝은 민트
-            Color(0xFF10B981), // 메인 에메랄드
-          ]
-        ) : null
-      ),
-      child: Text(
-        message.content,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
+    final bubble = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth * 0.60),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: bubbleColor,
+          borderRadius: BorderRadius.circular(16),
+          gradient: isMine ? LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF34D399), // 밝은 민트
+              Color(0xFF10B981), // 메인 에메랄드
+            ]
+          ) : null
+        ),
+        child: Text(
+          message.content,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -707,6 +711,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         // reverse: true 이므로 위쪽으로 갈수록 index가 커짐
         return _buildBubble(
           message,
+          MediaQuery.sizeOf(context).width,
           senderName: memberNameById[message.senderId],
         );
       },
@@ -818,6 +823,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                   Expanded(
                     child: TextField(
                       controller: _inputController,
+                      maxLines: null,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _sendMessage(),
                       decoration: inputDecorationWithHint("메시지 입력")

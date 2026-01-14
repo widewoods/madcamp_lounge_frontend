@@ -23,7 +23,7 @@ class ChatRoom {
     final createdAtRaw = json['created_at']?.toString();
     DateTime? createdAt;
     if (createdAtRaw != null && createdAtRaw.isNotEmpty) {
-      createdAt = DateTime.tryParse(createdAtRaw);
+      createdAt = DateTime.parse(createdAtRaw).add(Duration(hours: 9));
     }
 
     return ChatRoom(
@@ -34,7 +34,7 @@ class ChatRoom {
       createdAt: createdAt,
       lastMessageAt: json['last_message_at'] == null
           ? null
-          : DateTime.tryParse(json['last_message_at'].toString()),
+          : DateTime.parse(json['last_message_at'].toString()).add(Duration(hours: 9)),
       lastMessageContent: json['last_message_content']?.toString(),
       unreadCount: (json['unread_count'] ?? 0) as int,
     );

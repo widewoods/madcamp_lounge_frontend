@@ -18,8 +18,10 @@ class ChatMessage {
       messageId: (json['message_id'] as num).toInt(),
       senderId: (json['sender_id'] as num).toInt(),
       content: json['content'].toString(),
-      sentAt: DateTime.parse(json['sent_at'].toString()),
+
+      sentAt: DateTime.parse(json['sent_at'].toString()).add(Duration(hours: 9)),
       unreadCount: (json['unread_count'] ?? 0) as int,
+
     );
   }
 }
