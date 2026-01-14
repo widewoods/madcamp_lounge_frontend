@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/chatting/model/chat_room.dart';
 import 'package:madcamp_lounge/features/chatting/state/chatting_state.dart';
 import 'package:madcamp_lounge/features/chatting/ui/chat_room_page.dart';
+import 'package:madcamp_lounge/state/auth_state.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:madcamp_lounge/theme.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
