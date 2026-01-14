@@ -139,6 +139,28 @@ class ChatRoomDetailNotifier extends StateNotifier<ChatRoomDetailState> {
         detail: detail.copyWith(messages: updatedMessages)
     );
   }
+
+  void applyReadUpTo(int lastMessageId) {
+    final detail = state.detail;
+    if (detail == null) return;
+
+    final updatedMessages = detail.messages
+        .map((message) {
+          if (message.messageId <= lastMessageId && message.unreadCount > 0) {
+            return ChatMessage(
+              messageId: message.messageId,
+              senderId: message.senderId,
+              content: message.content,
+              sentAt: message.sentAt,
+              unreadCount: message.unreadCount - 1,
+            );
+          }
+          return message;
+        })
+        .toList();
+
+    state = state.copyWith(detail: detail.copyWith(messages: updatedMessages));
+  }
 }
 
 final chatRoomDetailProvider = StateNotifierProvider.family<

@@ -34,6 +34,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   bool _loadingMoreRequest = false;
   DateTime? _lastLoadMoreAt;
   int? _userId;
+  int? _lastReadAppliedId;
   int? _pendingReadMessageId;
   ProviderSubscription<ChatRoomDetailState>? _detailSub;
 
@@ -189,6 +190,12 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   void _sendRead(int lastMessageId) {
     if (!(_stompClient?.connected == true && _stompConnected)) return;
+    if (_lastReadAppliedId == null || lastMessageId > _lastReadAppliedId!) {
+      ref
+          .read(chatRoomDetailProvider(widget.roomId).notifier)
+          .applyReadUpTo(lastMessageId);
+      _lastReadAppliedId = lastMessageId;
+    }
     _stompClient?.send(
       destination: '/app/rooms/${widget.roomId}/read',
       body: jsonEncode({'last_message_id': lastMessageId}),
