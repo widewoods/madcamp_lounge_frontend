@@ -170,7 +170,15 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   void _sendMessage() {
     final text = _inputController.text.trim();
-    if (text.isEmpty || !_stompConnected) return;
+    final isConnected = _stompClient?.connected == true && _stompConnected;
+    if (text.isEmpty || !isConnected) {
+      if (text.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('연결이 끊어졌습니다. 다시 시도해주세요.')),
+        );
+      }
+      return;
+    }
 
     _stompClient?.send(
       destination: '/app/rooms/${widget.roomId}',
@@ -180,7 +188,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   }
 
   void _sendRead(int lastMessageId) {
-    if (!_stompConnected) return;
+    if (!(_stompClient?.connected == true && _stompConnected)) return;
     _stompClient?.send(
       destination: '/app/rooms/${widget.roomId}/read',
       body: jsonEncode({'last_message_id': lastMessageId}),
@@ -384,7 +392,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     }
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     final roomId = (data['room_id'] as num).toInt();
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => ChatRoomPage(roomId: roomId)),
     );
   }
@@ -537,6 +545,8 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           '${value.minute.toString().padLeft(2, '0')}';
     }
 
+    final unreadLabel = message.unreadCount > 0 ? '${message.unreadCount}' : '';
+
     final bubble = Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -569,12 +579,26 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              _formatTime(message.sentAt),
-              style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFF9AA0AE),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (unreadLabel.isNotEmpty)
+                  Text(
+                    unreadLabel,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                Text(
+                  _formatTime(message.sentAt),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF9AA0AE),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(width: 6),
             bubble,
@@ -634,12 +658,26 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                   children: [
                     Flexible(child: bubble),
                     const SizedBox(width: 6),
-                    Text(
-                      _formatTime(message.sentAt),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF9AA0AE),
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (unreadLabel.isNotEmpty)
+                          Text(
+                            unreadLabel,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        Text(
+                          _formatTime(message.sentAt),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF9AA0AE),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
