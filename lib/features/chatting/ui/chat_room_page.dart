@@ -369,6 +369,26 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
+  Future<void> _startDirectChat(int userId) async {
+    final apiClient = ref.read(apiClientProvider);
+    final res = await apiClient.postJson(
+      '/chat/rooms',
+      body: {'user_id': userId},
+    );
+    if (!mounted) return;
+    if (res.statusCode != 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('채팅방 생성에 실패했습니다.')),
+      );
+      return;
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final roomId = (data['room_id'] as num).toInt();
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ChatRoomPage(roomId: roomId)),
+    );
+  }
+
   void _showProfileSheet(int userId) {
     showModalBottomSheet(
       context: context,
@@ -439,6 +459,25 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                               fontWeight: FontWeight.w800,
                             ),
                           ),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _startDirectChat(userId);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF4C46E5)),
+                            foregroundColor: const Color(0xFF4C46E5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          child: const Text('1:1 채팅'),
                         ),
                       ],
                     ),
@@ -640,7 +679,18 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(chatRoomDetailProvider(widget.roomId));
     final detail = state.detail;
-    final baseTitle = detail?.partyTitle ?? '채팅방 ${widget.roomId}';
+    String? otherName;
+    if (detail != null && _userId != null) {
+      for (final member in detail.members) {
+        if (member.userId == _userId) continue;
+        otherName = member.nickname.isNotEmpty ? member.nickname : member.name;
+        if (otherName.isNotEmpty) break;
+      }
+    }
+    final baseTitle = detail?.partyTitle ??
+        (otherName != null && otherName.isNotEmpty
+            ? otherName
+            : '채팅방 ${widget.roomId}');
     final memberCount = detail?.members.length ?? 0;
     final memberNameById = detail == null
         ? const <int, String>{}

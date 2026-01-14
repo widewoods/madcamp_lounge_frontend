@@ -2,6 +2,7 @@ class ChatRoom {
   final int roomId;
   final int? partyId;
   final String? partyTitle;
+  final String? otherName;
   final DateTime? createdAt;
   final DateTime? lastMessageAt;
   final String? lastMessageContent;
@@ -11,6 +12,7 @@ class ChatRoom {
     required this.roomId,
     required this.partyId,
     required this.partyTitle,
+    required this.otherName,
     required this.createdAt,
     required this.lastMessageAt,
     required this.lastMessageContent,
@@ -28,6 +30,7 @@ class ChatRoom {
       roomId: (json['room_id'] as num).toInt(),
       partyId: json['party_id'] == null ? null : (json['party_id'] as num).toInt(),
       partyTitle: json['party_title']?.toString(),
+      otherName: json['other_name']?.toString(),
       createdAt: createdAt,
       lastMessageAt: json['last_message_at'] == null
           ? null
