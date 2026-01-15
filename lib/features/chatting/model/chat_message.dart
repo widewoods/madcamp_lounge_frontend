@@ -13,6 +13,22 @@ class ChatMessage {
     required this.unreadCount,
   });
 
+  ChatMessage copyWith({
+    int? messageId,
+    int? senderId,
+    String? content,
+    DateTime? sentAt,
+    int? unreadCount,
+  }) {
+    return ChatMessage(
+      messageId: messageId ?? this.messageId,
+      senderId: senderId ?? this.senderId,
+      content: content ?? this.content,
+      sentAt: sentAt ?? this.sentAt,
+      unreadCount: unreadCount ?? this.unreadCount,
+    );
+  }
+
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       messageId: (json['message_id'] as num).toInt(),

@@ -34,19 +34,22 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   bool _loadingMoreRequest = false;
   DateTime? _lastLoadMoreAt;
   int? _userId;
-  int? _lastReadAppliedId;
   int? _pendingReadMessageId;
   ProviderSubscription<ChatRoomDetailState>? _detailSub;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(chatRoomDetailProvider(widget.roomId).notifier).loadInitial();
+    // 1. 내 ID를 먼저 가져오고 로딩을 시작합니다.
+    _loadUserId().then((_) {
+      if (_userId != null && mounted) {
+        ref.read(chatRoomDetailProvider(widget.roomId).notifier).loadInitial(_userId!);
+      }
     });
+
     _detailSub = ref.listenManual<ChatRoomDetailState>(
       chatRoomDetailProvider(widget.roomId),
-      (previous, next) {
+          (previous, next) {
         if (previous?.detail == null && next.detail != null) {
           final messages = next.detail!.messages;
           if (messages.isNotEmpty) {
@@ -61,7 +64,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         }
       },
     );
-    _loadUserId();
     _scrollController.addListener(_handleScroll);
     _connectStomp();
   }
@@ -138,17 +140,34 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     _stompClient?.subscribe(
       destination: '/topic/rooms/${widget.roomId}',
       callback: (message) {
-        if (message.body == null) return;
+        if (message.body == null || _userId == null) return;
         final data = jsonDecode(message.body!) as Map<String, dynamic>;
         final chatMessage = ChatMessage.fromJson(data);
-        ref.read(chatRoomDetailProvider(widget.roomId).notifier).appendMessage(chatMessage);
+
+        // 내 ID를 넘겨주어 로컬 카운트 반영
+        ref.read(chatRoomDetailProvider(widget.roomId).notifier)
+            .appendMessage(chatMessage, _userId!);
+
         _sendRead(chatMessage.messageId);
         _scrollToBottom();
       },
     );
+
     _stompClient?.subscribe(
       destination: '/topic/rooms/${widget.roomId}/read',
-      callback: (_) {},
+      callback: (message) {
+        if (message.body == null || _userId == null) return;
+        final data = jsonDecode(message.body!) as Map<String, dynamic>;
+
+        final readerId = (data['user_id'] as num?)?.toInt();
+        final lastMessageId = (data['last_message_id'] as num?)?.toInt();
+
+        // [핵심] 본인의 읽음 신호는 이미 위 로직들에서 처리했으므로 중복 방지를 위해 무시
+        if (readerId == null || lastMessageId == null || readerId == _userId) return;
+
+        ref.read(chatRoomDetailProvider(widget.roomId).notifier)
+            .applyReadRange(readerId, lastMessageId);
+      },
     );
     if (_pendingReadMessageId != null) {
       _sendRead(_pendingReadMessageId!);
@@ -190,12 +209,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   void _sendRead(int lastMessageId) {
     if (!(_stompClient?.connected == true && _stompConnected)) return;
-    if (_lastReadAppliedId == null || lastMessageId > _lastReadAppliedId!) {
-      ref
-          .read(chatRoomDetailProvider(widget.roomId).notifier)
-          .applyReadUpTo(lastMessageId);
-      _lastReadAppliedId = lastMessageId;
-    }
     _stompClient?.send(
       destination: '/app/rooms/${widget.roomId}/read',
       body: jsonEncode({'last_message_id': lastMessageId}),
@@ -552,7 +565,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       return '${value.hour.toString().padLeft(2, '0')}:'
           '${value.minute.toString().padLeft(2, '0')}';
     }
-    
+
     final unreadLabel = message.unreadCount > 0 ? '${message.unreadCount}' : '';
 
     final bubble = ConstrainedBox(

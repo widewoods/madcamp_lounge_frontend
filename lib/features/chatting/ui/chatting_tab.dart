@@ -6,9 +6,6 @@ import 'package:madcamp_lounge/features/chatting/ui/chat_room_page.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:madcamp_lounge/theme.dart';
-import 'package:stomp_dart_client/stomp_dart_client.dart';
-
-import '../../../state/auth_state.dart';
 
 class ChattingTab extends ConsumerStatefulWidget {
   const ChattingTab({super.key});
