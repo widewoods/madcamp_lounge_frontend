@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madcamp_lounge/features/party/party_list_provider.dart';
 import 'package:madcamp_lounge/pages/main_page.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

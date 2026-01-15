@@ -6,6 +6,7 @@ import 'package:madcamp_lounge/features/party/ui/party_tab.dart';
 import 'package:madcamp_lounge/features/profile/profile_tab.dart';
 import 'package:madcamp_lounge/features/recommend/recommend_tab.dart';
 import 'package:madcamp_lounge/features/recommend/state/recommend_providers.dart';
+import 'package:madcamp_lounge/theme.dart';
 
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -58,14 +59,23 @@ class _MainPageState extends ConsumerState<MainPage> {
           barrierDismissible: false,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: scaffoldBackgroundColor,
               title: const Text('비밀번호 변경 권장'),
               content: const Text(
                 '현재 비밀번호가 초기 비밀번호입니다.\n보안을 위해 비밀번호를 변경해주세요.',
+                style: TextStyle(
+                  fontSize: 16
+                ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('확인'),
+                Center(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: kPrimary,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('확인', style: TextStyle(color: kPrimary),),
+                  ),
                 ),
               ],
             );

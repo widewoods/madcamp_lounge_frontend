@@ -63,13 +63,6 @@ final recommendCategories = <RecommendCategory>[
     keyword: '카페',
   ),
   RecommendCategory(
-    id: '운동',
-    title: '운동',
-    imageUrl:
-    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80',
-    keyword: '헬스장',
-  ),
-  RecommendCategory(
     id: '노래',
     title: '노래방',
     imageUrl:
@@ -103,5 +96,19 @@ final recommendCategories = <RecommendCategory>[
     imageUrl:
     'https://unsplash.com/photos/NY1D4Zni7fc/download?auto=format&fit=crop&w=1200&q=80',
     keyword: '클라이밍장',
+  ),
+  RecommendCategory(
+    id: '술집',
+    title: '술집',
+    imageUrl:
+    'https://unsplash.com/photos/_wdOjxXPxUU/download?auto=format&fit=crop&w=1200&q=80',
+    keyword: '술집',
+  ),
+  RecommendCategory(
+    id: '농구',
+    title: '농구',
+    imageUrl:
+    'https://unsplash.com/photos/BfphcCvhl6E/download?auto=format&fit=crop&w=1200&q=80',
+    keyword: '농구장',
   ),
 ];

@@ -36,6 +36,7 @@ dependencies:
   flutter_naver_map: ^1.4.4
   stomp_dart_client: ^2.0.0
   pool: ^1.5.1
+  flutter_native_splash: ^2.4.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -51,9 +52,18 @@ dev_dependencies:
   flutter_launcher_icons: "^0.14.4"
 
 
-flutter_icons:
-  image_path: "assets/images/icon.png"
+flutter_launcher_icons:
+  image_path: "assets/icons/app_icon.png"
   android: true
+
+flutter_native_splash:
+  color: "#FFFFFF" # 스플래시 화면의 배경색 설정 (흰색)
+  image: "assets/icons/app_icon.png" # 스플래시 화면에 표시될 이미지 설정 (앱 로고)
+  android: true # 안드로이드 플랫폼에 스플래시 화면 적용
+  ios: true # iOS 플랫폼에 스플래시 화면 적용
+  android_12: # Android 12 이상을 위한 추가 설정
+    color: "#FFFFFF" # Android 12 이상 스플래시 화면의 배경색 (흰색)
+    image: "assets/icons/app_icon.png" # Android 12 이상 스플래시 화면에 표시될 이미지
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

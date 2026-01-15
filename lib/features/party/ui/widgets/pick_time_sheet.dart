@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 Future<TimeOfDay?> showTimeGridSheet(BuildContext context) {
   final times = <TimeOfDay>[];
-  for (int h = 9; h <= 21; h++) {
+  for (int h = 9; h <= 23; h++) {
     times.add(TimeOfDay(hour: h, minute: 0));
     times.add(TimeOfDay(hour: h, minute: 30));
   }
-  times.add(TimeOfDay(hour: 22, minute: 0));
+  times.add(TimeOfDay(hour: 24, minute: 0));
 
   String fmt(TimeOfDay t) => "${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
 

@@ -14,6 +14,8 @@ import 'package:madcamp_lounge/pages/login.dart';
 import 'package:madcamp_lounge/state/auth_state.dart';
 import 'package:madcamp_lounge/theme.dart';
 
+import '../party/party_list_provider.dart';
+
 class ProfileTab extends ConsumerStatefulWidget {
   const ProfileTab({super.key});
 
@@ -118,6 +120,9 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
 
     await storage.delete(key: 'refreshToken');
     ref.read(accessTokenProvider.notifier).state = null;
+    ref.invalidate(userIdProvider);
+    ref.invalidate(partyListProvider);
+
 
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
@@ -238,14 +243,6 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                               ),
                               SizedBox(height: 4),
                               ExpandableBio(bio: _introductionCtrl.text),
-                              // Text(
-                              //   _introductionCtrl.text,
-                              //   style: TextStyle(
-                              //     fontSize: 14,
-                              //     fontWeight: FontWeight.w700,
-                              //     color: Color(0xFF575757),
-                              //   ),
-                              // ),
                             ],
                           ),
                         ),

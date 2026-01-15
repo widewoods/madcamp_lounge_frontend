@@ -163,7 +163,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     setState(() {
                       _categoryCtrl.text = picked;
                     });
-                  }
+                  },
                 ),
 
                 const SizedBox(height: _formPadding),

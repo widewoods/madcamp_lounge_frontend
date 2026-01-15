@@ -49,6 +49,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Madcamp Lounge',
+      debugShowCheckedModeBanner: false,
       theme: buildTheme(),
       home: const AuthGate(),
     );

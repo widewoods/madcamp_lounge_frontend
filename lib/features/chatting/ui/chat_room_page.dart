@@ -624,30 +624,31 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            splashColor: Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => _showProfileSheet(message.senderId),
-            child: Container(
-              width: 32,
-              height: 32,
-              margin: const EdgeInsets.only(right: 8, top: 6),
-              decoration:  BoxDecoration(
-                color: kPrimary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                    senderName![0],
-                    style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold
+          if (senderName != null && senderName.isNotEmpty)
+            InkWell(
+              splashColor: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => _showProfileSheet(message.senderId),
+              child: Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.only(right: 8, top: 6),
+                decoration:  BoxDecoration(
+                  color: kPrimary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                      senderName![0],
+                      style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

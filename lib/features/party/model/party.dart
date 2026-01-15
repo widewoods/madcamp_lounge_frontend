@@ -37,7 +37,7 @@ class Party {
 
   factory Party.fromJson(Map<String, dynamic> json, int userId){
     final formattedTime = formatIsoKorean(parseIso(json['appointment_time']));
-    final category = recommendCategories.where((e) => e.title == json['category'].toString()).toList();
+    final category = recommendCategories.where((e) => e.id == json['category'].toString()).toList();
     final party = Party(
       partyId: json['id'] as int,
       title: json['title'].toString(),

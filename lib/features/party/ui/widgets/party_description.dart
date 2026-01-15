@@ -119,7 +119,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                   children: [
                     Icon(Icons.info_outline_rounded, color: Color(0xFF757575), size: 18,),
                     const SizedBox(width: 5),
-                    Text(widget.party.content!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
+                    Expanded(child: Text(widget.party.content!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400,), maxLines: null,)),
                   ],
                 ),
 
