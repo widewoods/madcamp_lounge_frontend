@@ -10,7 +10,7 @@ class RecommendListPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncPlaces = ref.watch(allPlacesProvider);
+    final asyncPlaces = ref.watch(placesByCategoryProvider(category));
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -19,12 +19,12 @@ class RecommendListPage extends ConsumerWidget {
         centerTitle: true,
       ),
       body: asyncPlaces.when(
-        data: (places) => places[category.id]!.isNotEmpty ? ListView.separated(
+        data: (places) => places.isNotEmpty ? ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          itemCount: places[category.id]!.length,
+          itemCount: places.length,
           separatorBuilder: (_, __) => const SizedBox(height: 12),
           itemBuilder: (_, i) => PlaceCard(
-            place: places[category.id]![i],
+            place: places[i],
           ),
           ) : Center(child: Text("근처에 검색된 장소가 없습니다."),
         ),

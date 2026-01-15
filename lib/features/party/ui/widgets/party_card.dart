@@ -6,6 +6,7 @@ import 'package:madcamp_lounge/gradient_button.dart';
 import 'package:madcamp_lounge/theme.dart';
 
 import '../../../../pages/main_page.dart';
+import '../../date_formatting.dart';
 import '../../model/party.dart';
 
 class PartyCard extends StatefulWidget {
@@ -23,10 +24,11 @@ class PartyCard extends StatefulWidget {
 }
 
 class _PartyCardState extends State<PartyCard> {
+
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).primaryColor;
-
+    final formattedTime = formatIsoKorean(parseIso(widget.party.time));
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
@@ -113,7 +115,7 @@ class _PartyCardState extends State<PartyCard> {
                         ),
                         const SizedBox(height: 8),
 
-                        _InfoRow(icon: Icons.access_time, text: widget.party.time),
+                        _InfoRow(icon: Icons.access_time, text: formattedTime),
                         const SizedBox(height: 6),
                         _InfoRow(icon: Icons.location_on, text: widget.party.locationText),
                         const SizedBox(height: 6),

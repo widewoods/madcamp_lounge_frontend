@@ -20,10 +20,10 @@ final allPlacesProvider = FutureProvider<Map<String, List<Place>>>((ref) async {
   final Map<String, List<Place>> map = {};
 
   for (final category in recommendCategories) {
-    final results = await RecommendSearchService.searchNearby(
+    final results = await RecommendSearchService.searchNearbyExpanded(
       pos: pos,
       categoryKeyword: category.keyword,
-      radiusKm: 3,
+      radiusKm: 2,
     );
 
     final places = results
@@ -43,4 +43,29 @@ final allPlacesProvider = FutureProvider<Map<String, List<Place>>>((ref) async {
 
   return map;
 
+});
+
+final placesByCategoryProvider =
+FutureProvider.family<List<Place>, RecommendCategory>((ref, category) async {
+  final pos = await ref.watch(currentPositionProvider.future);
+
+  final results = await RecommendSearchService.searchNearbyExpanded(
+    pos: pos,
+    categoryKeyword: category.keyword,
+    radiusKm: 2,
+  );
+
+  final places = results
+      .map((r) => Place(
+    categoryId: category.id,
+    name: r.title,
+    address: r.address,
+    distanceKm: r.distanceKm,
+    lat: r.lat,
+    lng: r.lon,
+  ))
+      .toList()
+    ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+
+  return places;
 });

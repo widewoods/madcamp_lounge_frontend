@@ -47,10 +47,6 @@ class _MainPageState extends ConsumerState<MainPage> {
   void initState() {
     super.initState();
     _selectedIndex = widget.startIndex ?? 0;
-    Future.microtask(() {
-      ref.read(allPlacesProvider.future);
-      }
-    );
     if (widget.showPasswordChangeDialog) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;

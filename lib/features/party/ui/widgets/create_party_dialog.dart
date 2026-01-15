@@ -13,10 +13,14 @@ class CreatePartyDialog extends StatefulWidget {
     super.key,
     this.initialPlace,
     this.initialCategory,
+    this.initialParty,
   });
 
   final String? initialPlace;
   final String? initialCategory;
+  final Party? initialParty;
+
+  bool get isEdit => initialParty != null;
 
   @override
   State<CreatePartyDialog> createState() => _CreatePartyDialogState();
@@ -42,6 +46,24 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     super.initState();
     _locationCtrl.text = widget.initialPlace ?? '';
     _categoryCtrl.text = widget.initialCategory ?? '';
+
+    final p = widget.initialParty;
+    if (p != null) {
+      _titleCtrl.text = p.title;
+      _categoryCtrl.text = p.category;
+      _locationCtrl.text = p.locationText;
+      _contentCtrl.text = p.content ?? '';
+      _capacity = p.targetCount;
+      final dt = DateTime.tryParse(p.time);
+      if (dt != null) {
+        _selectedDate = dt;
+        _selectedTime = TimeOfDay(hour: dt.hour, minute: dt.minute);
+
+        _dateCtrl.text = formatDateLabel(dt);
+        _timeCtrl.text =
+        "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+      }
+    }
   }
 
   @override
@@ -76,9 +98,9 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
               children: [
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        "파티 만들기",
+                        widget.isEdit ? "파티 수정" : "파티 만들기",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -217,7 +239,7 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
                     Expanded(
                       child: GradientButton(
                         onPressed: disabled ? null : _submit,
-                        text: "만들기",
+                        text: widget.isEdit ? "저장" : "생성",
                         colors: gradientColor,
                       ),
                     ),
@@ -235,6 +257,26 @@ class _CreatePartyDialogState extends State<CreatePartyDialog> {
     final category = _categoryCtrl.text.trim();
     final location = _locationCtrl.text.trim();
     final content = _contentCtrl.text.trim();
+
+    if (widget.initialParty != null) {
+      final old = widget.initialParty!;
+      final updated = Party(
+        partyId: old.partyId,
+        title: title,
+        category: category,
+        time: dateTimeToIsoFromPickers(selectedDate: _selectedDate!, selectedTime: _selectedTime!),
+        locationText: location,
+        currentCount: old.currentCount,
+        targetCount: _capacity,
+        imageUrl: old.imageUrl,
+        members: old.members,
+        content: content,
+        isHost: old.isHost,
+      );
+
+      Navigator.pop(context, updated);
+      return;
+    }
 
     final party = Party(
       partyId: 0,

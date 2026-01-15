@@ -125,109 +125,100 @@ class _ChattingTabState extends ConsumerState<ChattingTab> {
     final lastMessageContent = (room.lastMessageContent ?? '').trim();
     final hasLastMessage = lastMessageContent.isNotEmpty || lastMessageAt.isNotEmpty;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () => _openChatRoom(context, room),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          // borderRadius: BorderRadius.circular(14),
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Color(0x14000000).withValues(alpha: 0.1),
-          //     blurRadius: 4,
-          //     offset: Offset(0, 3),
-          //   ),
-          // ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 54,
-              height: 54,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                gradient: RadialGradient(
-                  center: Alignment.topLeft,
-                  colors: [
-                    kPrimary.withValues(alpha: 0.5),
-                    kPrimary.withValues(alpha: 0.8),
-                  ],
-                  radius: 1.1
-
-                )
-              ),
-              padding: EdgeInsets.only(top: 2.0),
-              child: const Icon(
-                Icons.chat_bubble_outline_rounded,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF111827),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        lastMessageAt,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        onTap: () => _openChatRoom(context, room),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: RadialGradient(
+                    center: Alignment.topLeft,
+                    colors: [
+                      kPrimary.withValues(alpha: 0.5),
+                      kPrimary.withValues(alpha: 0.8),
                     ],
+                    radius: 1.1
 
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      if (!hasLastMessage)
-                        Expanded(
-                          child: const Text(
-                            '최근 메시지 없음',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        )
-                      else ...[
+                  )
+                ),
+                padding: EdgeInsets.only(top: 2.0),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
                         Expanded(
                           child: Text(
-                            lastMessageContent.isEmpty ? '메시지 없음' : lastMessageContent,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            title,
                             style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF6B7280),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF111827),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        Text(
+                          lastMessageAt,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
                       ],
-                      if (room.unreadCount > 0) _buildUnreadBadge(room.unreadCount),
-                    ],
-                  )
 
-                ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        if (!hasLastMessage)
+                          Expanded(
+                            child: const Text(
+                              '최근 메시지 없음',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
+                          )
+                        else ...[
+                          Expanded(
+                            child: Text(
+                              lastMessageContent.isEmpty ? '메시지 없음' : lastMessageContent,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                        if (room.unreadCount > 0) _buildUnreadBadge(room.unreadCount),
+                      ],
+                    )
+
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

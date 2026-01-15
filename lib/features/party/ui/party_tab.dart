@@ -23,8 +23,6 @@ class PartyTab extends ConsumerStatefulWidget {
 
 class _PartyTabState extends ConsumerState<PartyTab> {
 
-  ProviderSubscription<int>? _sub;
-
   Future<void> _openCreatePartyDialog({
     String? initialPlace,
     String? initialCategory,
@@ -92,12 +90,6 @@ class _PartyTabState extends ConsumerState<PartyTab> {
   @override
   void initState(){
     super.initState();
-
-    _sub = ref.listenManual<int>(bottomNavIndexProvider, (prev, next) {
-      if (next == 0 && prev != 0) {
-        ref.invalidate(partyListProvider);
-      }
-    });
   }
 
   @override

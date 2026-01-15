@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madcamp_lounge/features/party/model/party.dart';
 
 import '../../../../api_client.dart';
+import '../../date_formatting.dart';
 import '../../party_list_provider.dart';
+import 'create_party_dialog.dart';
 
 class PartyDescription extends ConsumerStatefulWidget {
   const PartyDescription({super.key, required this.party});
@@ -15,6 +17,8 @@ class PartyDescription extends ConsumerStatefulWidget {
 }
 
 class _PartyDescriptionState extends ConsumerState<PartyDescription> {
+  late Party _party;
+
   Future<void> _closeParty() async {
     final apiClient = ref.read(apiClientProvider);
     final res = await apiClient.patchJson(
@@ -32,6 +36,48 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed: ${res.statusCode}')),
       );
+    }
+  }
+
+  Future<void> _openCreatePartyDialog() async {
+    final edited = await showDialog<Party>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => CreatePartyDialog(initialParty: _party,),
+    );
+
+    if (edited != null) {
+      final apiClient = ref.read(apiClientProvider);
+      final res = await apiClient.patchJson(
+          '/party/edit',
+          body: {
+            'party_id': edited.partyId,
+            'title': edited.title,
+            'appointment_time': edited.time,
+            'category': edited.category,
+            'content': edited.content,
+            'place_name': edited.locationText,
+            'target_count': edited.targetCount,
+          }
+      );
+
+      if(!mounted) return;
+
+      if(res.statusCode == 200){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('파티 수정됨')),
+        );
+        ref.invalidate(partyListProvider);
+        setState(() {
+          _party = edited;
+        });
+      } else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: ${res.statusCode}')),
+        );
+      }
+
+      setState(() {});
     }
   }
 
@@ -67,9 +113,16 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
     ref.invalidate(partyListProvider);
   }
 
+  @override @override
+  void initState() {
+    super.initState();
+    _party = widget.party;
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final formattedTime = formatIsoKorean(parseIso(_party.time));
     final Color kPrimary = Theme.of(context).primaryColor;
     final Color infoBackgroundColor = Colors.grey.withValues(alpha: 0.09);
     return Dialog(
@@ -84,10 +137,16 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.party.title,
+                      _party.title,
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
                   ),
+                  if(_party.isHost)
+                    IconButton(
+                        onPressed: () {
+                          _openCreatePartyDialog();
+                        },
+                        icon: Icon(Icons.edit)),
                   IconButton(onPressed: (){
                     Navigator.of(context).pop();
                   }, icon: Icon(Icons.close))
@@ -107,19 +166,19 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    widget.party.category,
+                    _party.category,
                     style: TextStyle(color: kPrimary, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
 
-              if (widget.party.content != null)
+              if (_party.content != null)
                 Row(
                   children: [
                     Icon(Icons.info_outline_rounded, color: Color(0xFF757575), size: 18,),
                     const SizedBox(width: 5),
-                    Expanded(child: Text(widget.party.content!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400,), maxLines: null,)),
+                    Expanded(child: Text(_party.content!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400,), maxLines: null,)),
                   ],
                 ),
 
@@ -127,14 +186,14 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
 
               _infoRow(
                 info: "일시",
-                infoText: widget.party.time,
+                infoText: formattedTime,
                 icon: Icons.calendar_today_outlined,
                 kPrimary: kPrimary,
               ),
               const SizedBox(height: 5),
               _infoRow(
                 info: "장소",
-                infoText: widget.party.locationText,
+                infoText: _party.locationText,
                 icon: Icons.location_pin,
                 kPrimary: kPrimary,
               ),
@@ -142,7 +201,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
               _infoRow(
                 info: "인원",
                 infoText:
-                    "${widget.party.currentCount} / ${widget.party.targetCount}명",
+                    "${_party.currentCount} / ${_party.targetCount}명",
                 icon: Icons.people_outline,
                 kPrimary: kPrimary,
               ),
@@ -153,11 +212,11 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
                   Icon(Icons.people_sharp),
                   const SizedBox(width: 10),
                   Text(
-                    "참가자 (${widget.party.currentCount}명)",
+                    "참가자 (${_party.currentCount}명)",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
 
-                  if (widget.party.joined)
+                  if (_party.joined)
                     Expanded(
                       child: Align(
                         alignment: AlignmentGeometry.centerRight,
@@ -175,7 +234,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
               SingleChildScrollView(
                 child: Column(
                   children: [
-                    for (Map<String, dynamic> member in widget.party.members)
+                    for (Map<String, dynamic> member in _party.members)
                       _MemberProfile(infoBackgroundColor: infoBackgroundColor, kPrimary: kPrimary, member: member),
                   ],
                 ),
@@ -184,7 +243,7 @@ class _PartyDescriptionState extends ConsumerState<PartyDescription> {
 
               const SizedBox(height: 10,),
 
-              if(widget.party.isHost)
+              if(_party.isHost)
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red
