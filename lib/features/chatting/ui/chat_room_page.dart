@@ -566,8 +566,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           '${value.minute.toString().padLeft(2, '0')}';
     }
 
-    final unreadLabel = message.unreadCount > 0 ? '${message.unreadCount}' : '';
-
     final bubble = ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth * 0.60),
       child: Container(
@@ -603,26 +601,12 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (unreadLabel.isNotEmpty)
-                  Text(
-                    unreadLabel,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                Text(
-                  _formatTime(message.sentAt),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF9AA0AE),
-                  ),
-                ),
-              ],
+            Text(
+              _formatTime(message.sentAt),
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFF9AA0AE),
+              ),
             ),
             const SizedBox(width: 6),
             bubble,
@@ -683,26 +667,12 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                   children: [
                     Flexible(child: bubble),
                     const SizedBox(width: 6),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (unreadLabel.isNotEmpty)
-                          Text(
-                            unreadLabel,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        Text(
-                          _formatTime(message.sentAt),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF9AA0AE),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      _formatTime(message.sentAt),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF9AA0AE),
+                      ),
                     ),
                   ],
                 ),

@@ -156,6 +156,8 @@ class _LoginPage extends ConsumerState<LoginPage> {
       final refreshToken = data['refreshToken'];
 
       ref.read(accessTokenProvider.notifier).state = accessToken;
+      ref.invalidate(userIdProvider);
+      ref.invalidate(partyListProvider);
       await _storage.write(key: 'refreshToken', value: refreshToken);
 
       if (!mounted) return;
